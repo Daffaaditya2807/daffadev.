@@ -12,6 +12,7 @@ const navItems = [
   { id: "lab", label: "Lab" },
   { id: "contact", label: "Contact" },
   { id: "blog", label: "Blog", href: "/blog" },
+  { id: "quiz", label: "Quiz", href:"/quiz" },
 ];
 
 function PortfolioPage() {

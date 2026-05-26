@@ -7,6 +7,7 @@ const iconMap = {
   Lab: Briefcase,
   Contact: Mail,
   Blog: Newspaper,
+  Quiz: Mail
 };
 
 function Navbar({

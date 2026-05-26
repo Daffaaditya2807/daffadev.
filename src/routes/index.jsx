@@ -12,6 +12,7 @@ import TypingTextPage from '../features/admin/presentation/pages/TypingTextPage'
 import BlogPage from '../features/admin/presentation/pages/BlogPage'
 import BlogUserPage from '../features/blog/page/BlogUserPage'
 import BlogDetailPage from '../features/blog/page/BlogDetailPage'
+import QuizPage from '../features/quiz/page/QuizPage'
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
   {
     path: '/blog/:slug',
     element: <BlogDetailPage />,
+  },
+  {
+    path: '/quiz',
+    element: <QuizPage />,
   },
   {
     path: '/admin',

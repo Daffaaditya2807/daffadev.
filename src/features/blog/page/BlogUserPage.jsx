@@ -28,7 +28,7 @@ function BlogUserPage() {
 
       const { data } = await supabase
         .from('blogs')
-        .select('id, title, slug, thumbnail, date, category')
+        .select('id, title, slug, thumbnail, date, category, description')
         .eq('is_active', true)
         .order('date', { ascending: false })
 

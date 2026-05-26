@@ -1,4 +1,4 @@
-import { Home, User, Beaker, Mail, Newspaper } from "lucide-react";
+import { Home, User, Beaker, Mail, Newspaper  } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const iconMap = {
@@ -7,6 +7,7 @@ const iconMap = {
   lab: Beaker,
   contact: Mail,
   blog: Newspaper,
+  quiz: Mail
 };
 
 function BottomNavigation({

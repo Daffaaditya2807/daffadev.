@@ -1,12 +1,18 @@
 import {
+  ChevronLeft,
+  ChevronRight,
   ExternalLink,
   Eye,
   Rotate3D,
   Globe,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useLabSection } from "../hooks/useLabSection";
 
+const PROJECTS_PER_PAGE = 6;
+
 function LabSection({ selectedProject, setSelectedProject }) {
+  const [currentPage, setCurrentPage] = useState(1);
   const {
     activeFilter,
     categories,
@@ -20,6 +26,30 @@ function LabSection({ selectedProject, setSelectedProject }) {
     selectedProject,
     setSelectedProject,
   });
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredProjects.length / PROJECTS_PER_PAGE)
+  );
+
+  const paginatedProjects = useMemo(() => {
+    const startIndex = (currentPage - 1) * PROJECTS_PER_PAGE;
+    return filteredProjects.slice(startIndex, startIndex + PROJECTS_PER_PAGE);
+  }, [currentPage, filteredProjects]);
+
+  const handlePreviousPage = () => {
+    setCurrentPage((page) => Math.max(1, page - 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((page) => Math.min(totalPages, page + 1));
+  };
+
+  const handleFilterChange = (filterId) => {
+    setCurrentPage(1);
+    handleChangeFilter(filterId);
+  };
+
  return (
     <section className="mx-auto max-w-7xl px-4  sm:px-6 lg:px-8">
       <SectionHeader />
@@ -27,7 +57,7 @@ function LabSection({ selectedProject, setSelectedProject }) {
       <CategoryFilter
         categories={categories}
         activeFilter={activeFilter}
-        onChangeFilter={handleChangeFilter}
+        onChangeFilter={handleFilterChange}
       />
 
       {isLoading ? (
@@ -43,15 +73,26 @@ function LabSection({ selectedProject, setSelectedProject }) {
           Belum ada project yang ditampilkan.
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {filteredProjects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onSelectProject={handleSelectProject}
+        <>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {paginatedProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onSelectProject={handleSelectProject}
+              />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <ProjectPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
             />
-          ))}
-        </div>
+          )}
+        </>
       )}
 
       {selectedProject && (
@@ -61,6 +102,41 @@ function LabSection({ selectedProject, setSelectedProject }) {
         />
       )}
     </section>
+  );
+}
+
+function ProjectPagination({
+  currentPage,
+  totalPages,
+  onPreviousPage,
+  onNextPage,
+}) {
+  return (
+    <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+      <button
+        type="button"
+        onClick={onPreviousPage}
+        disabled={currentPage === 1}
+        className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/70 transition hover:border-white/25 hover:bg-white/10 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        Sebelumnya
+      </button>
+
+      <span className="min-w-20 text-center text-sm text-gray-300">
+        {currentPage} / {totalPages}
+      </span>
+
+      <button
+        type="button"
+        onClick={onNextPage}
+        disabled={currentPage === totalPages}
+        className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/70 transition hover:border-white/25 hover:bg-white/10 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+      >
+        Selanjutnya
+        <ChevronRight className="h-4 w-4" />
+      </button>
+    </div>
   );
 }
 

@@ -1,8 +1,6 @@
 import Navbar from "../common/Navbar";
 import BottomNavigation from "../common/BottomNavigation";
 
-
-
 function MainLayout({
   children,
   navItems,
