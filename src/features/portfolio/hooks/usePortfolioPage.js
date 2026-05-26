@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function usePortfolioPage( navItems ) {
   const [activeSection, setActiveSection] = useState("home");
@@ -6,10 +6,14 @@ export function usePortfolioPage( navItems ) {
   const [showBottomNav, setShowBottomNav] = useState(false);
   const [isNavbarOnHero, setIsNavbarOnHero] = useState(true);
   const [selectedProject, setSelectedProject] = useState(null);
+  const loadedRef = useRef(false);
+
+  if (!loadedRef.current) {
+    loadedRef.current = true;
+    requestAnimationFrame(() => setIsLoaded(true));
+  }
 
   useEffect(() => {
-    setIsLoaded(true);
-
     // 1. Pindahkan fungsi ke dalam useEffect
     const updateActiveSection = () => {
       const scrollPosition = window.scrollY + window.innerHeight / 2;

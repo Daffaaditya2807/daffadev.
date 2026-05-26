@@ -17,8 +17,6 @@ import { getPortfolioAssetUrl, useAdminPortfolioPage } from '../hooks/usePortfol
 
 const PAGE_SIZE = 10
 
-const arrayToText = (items) => items.join('\n')
-
 const PortfolioPage = () => {
   const { showToast, confirmDelete } = useOutletContext()
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -31,8 +29,6 @@ const PortfolioPage = () => {
     isLoading,
     isSaving,
     uploadingField,
-    message,
-    errorMessage,
     handleChange,
     handleArrayChange,
     handleMainImageUpload,
@@ -43,7 +39,7 @@ const PortfolioPage = () => {
     handleDelete,
     handleToggleActive,
     resetForm,
-  } = useAdminPortfolioPage()
+  } = useAdminPortfolioPage(showToast)
 
   const typeOptions = categories.filter((item) => item.kind === 'type' && item.is_active)
   const categoryOptions = categories.filter((item) => item.kind === 'category' && item.is_active)
@@ -60,18 +56,6 @@ const PortfolioPage = () => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage((page) => Math.min(page, totalPages))
   }, [totalPages])
-
-  useEffect(() => {
-    if (message) {
-      showToast({ icon: 'success', title: message })
-    }
-  }, [message, showToast])
-
-  useEffect(() => {
-    if (errorMessage) {
-      showToast({ icon: 'error', title: errorMessage })
-    }
-  }, [errorMessage, showToast])
 
   const openCreateModal = () => {
     resetForm()
@@ -273,7 +257,7 @@ const PortfolioPage = () => {
       <Dialog.Root open={isModalOpen} onOpenChange={handleModalOpenChange}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[92vh] w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none">
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[92vh] w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-black/95 px-5 py-4">
               <Dialog.Title className="text-base font-semibold text-white">
                 {editingId ? 'Edit Portfolio' : 'Tambah Portfolio'}
@@ -431,16 +415,18 @@ const PortfolioPage = () => {
                 <ArrayField
                   id="tech_stack"
                   label="Tech Stack"
-                  value={arrayToText(form.tech_stack)}
-                  placeholder="Flutter&#10;Dart&#10;REST API"
-                  onChange={(event) => handleArrayChange('tech_stack', event.target.value)}
+                  value={form.tech_stack}
+                  placeholder="Flutter, Dart, REST API"
+                  onChange={handleChange}
+                  name="tech_stack"
                 />
                 <ArrayField
                   id="features"
                   label="Features"
-                  value={arrayToText(form.features)}
-                  placeholder="Real-time tracking&#10;Notifikasi&#10;History booking"
-                  onChange={(event) => handleArrayChange('features', event.target.value)}
+                  value={form.features}
+                  placeholder="Real-time tracking, Notifikasi, History booking"
+                  onChange={handleChange}
+                  name="features"
                 />
               </div>
 
@@ -519,8 +505,8 @@ const PortfolioPage = () => {
 
                   <textarea
                     id="screenshots"
-                    value={arrayToText(form.screenshots)}
-                    onChange={(event) => handleArrayChange('screenshots', event.target.value)}
+                    value={form.screenshots.join('\n')}
+                    onChange={(event) => handleArrayChange('screenshots', event.target.value, '\n')}
                     rows={4}
                     placeholder="Satu path gambar per baris"
                     className="w-full resize-y rounded-lg border border-white/10 bg-white/6 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus-visible:border-white/35 focus-visible:ring-1 focus-visible:ring-white/10"
@@ -588,16 +574,16 @@ function FormField({ label, htmlFor, children }) {
   )
 }
 
-function ArrayField({ id, label, value, placeholder, onChange }) {
+function ArrayField({ id, label, value, placeholder, onChange, name }) {
   return (
     <FormField label={label} htmlFor={id}>
-      <textarea
+      <Input
         id={id}
+        name={name || id}
         value={value}
         onChange={onChange}
-        rows={5}
         placeholder={placeholder}
-        className="w-full resize-y rounded-lg border border-white/10 bg-white/6 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus-visible:border-white/35 focus-visible:ring-1 focus-visible:ring-white/10"
+        className="h-10 border-white/10 bg-white/6 text-white placeholder:text-white/30 focus-visible:border-white/35 focus-visible:ring-white/10"
       />
     </FormField>
   )

@@ -130,3 +130,47 @@
     @apply font-sans;
     }
 }
+
+/* Blog Quill Editor Dark Theme */
+.blog-quill-editor .ql-toolbar {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+.blog-quill-editor .ql-toolbar .ql-stroke {
+  stroke: rgba(255, 255, 255, 0.6);
+}
+.blog-quill-editor .ql-toolbar .ql-fill {
+  fill: rgba(255, 255, 255, 0.6);
+}
+.blog-quill-editor .ql-toolbar .ql-picker-label {
+  color: rgba(255, 255, 255, 0.6);
+}
+.blog-quill-editor .ql-toolbar .ql-picker-options {
+  background: #1a1a1a;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.blog-quill-editor .ql-toolbar .ql-picker-item {
+  color: rgba(255, 255, 255, 0.7);
+}
+.blog-quill-editor .ql-container {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0 0 0.5rem 0.5rem;
+  min-height: 200px;
+  font-size: 0.875rem;
+}
+.blog-quill-editor .ql-editor {
+  color: white;
+  min-height: 200px;
+}
+.blog-quill-editor .ql-editor.ql-blank::before {
+  color: rgba(255, 255, 255, 0.3);
+  font-style: normal;
+}
+.blog-quill-editor .ql-editor img {
+  max-width: 100%;
+  height: auto;
+  cursor: pointer;
+  border-radius: 0.5rem;
+}

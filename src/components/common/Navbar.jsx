@@ -1,10 +1,12 @@
-import { Home, User, Briefcase, Mail } from "lucide-react";
+import { Home, User, Briefcase, Mail, Newspaper } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const iconMap = {
   Home,
   About: User,
   Lab: Briefcase,
   Contact: Mail,
+  Blog: Newspaper,
 };
 
 function Navbar({
@@ -14,6 +16,7 @@ function Navbar({
   isLoaded = false,
   isNavbarOnHero = false,
 }) {
+  const navigate = useNavigate()
   return (
     <nav
       className={`
@@ -45,7 +48,7 @@ function Navbar({
             <button
               key={item.id}
               type="button"
-              onClick={() => setActiveSection(item.id)}
+              onClick={() => item.href ? navigate(item.href) : setActiveSection(item.id)}
               className={`
                 group relative transition-all duration-500
                 ${

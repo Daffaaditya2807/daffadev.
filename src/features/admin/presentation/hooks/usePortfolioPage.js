@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '@/core/supabase'
+import { getCached, setCache, invalidateCache } from '@/core/cache'
 
 const STORAGE_BUCKET = 'portfolio-assets'
 
@@ -11,8 +12,8 @@ const initialForm = {
   long_description: '',
   image_path: '',
   screenshots: [],
-  tech_stack: [],
-  features: [],
+  tech_stack: '',
+  features: '',
   github_url: '',
   website_url: '',
   status: 'published',
@@ -38,13 +39,6 @@ const slugify = (value) => (
     .replace(/^-+|-+$/g, '') || 'project'
 )
 
-const parseLines = (value) => (
-  value
-    .split('\n')
-    .map((item) => item.trim())
-    .filter(Boolean)
-)
-
 export const getPortfolioAssetUrl = (path) => {
   if (!path) return ''
   if (path.startsWith('http')) return path
@@ -54,7 +48,7 @@ export const getPortfolioAssetUrl = (path) => {
   return supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath).data.publicUrl
 }
 
-export function useAdminPortfolioPage() {
+export function useAdminPortfolioPage(showToast) {
   const [items, setItems] = useState([])
   const [categories, setCategories] = useState([])
   const [form, setForm] = useState(initialForm)
@@ -62,12 +56,8 @@ export function useAdminPortfolioPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [uploadingField, setUploadingField] = useState('')
-  const [message, setMessage] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
 
   const fetchProjects = useCallback(async () => {
-    setErrorMessage('')
-
     const { data, error } = await supabase
       .from('lab_projects')
       .select('*, type:lab_categories!lab_projects_type_id_fkey(id,label), category:lab_categories!lab_projects_category_id_fkey(id,label)')
@@ -75,19 +65,33 @@ export function useAdminPortfolioPage() {
       .order('created_at', { ascending: true })
 
     if (error) {
-      setErrorMessage('Gagal mengambil data portfolio.')
+      showToast({ icon: 'error', title: 'Gagal mengambil data portfolio.' })
       setIsLoading(false)
       return
     }
 
     setItems(data || [])
+    setCache('portfolio', data || [])
     setIsLoading(false)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     let isMounted = true
 
     const loadData = async () => {
+      const cachedProjects = getCached('portfolio')
+      const cachedCategories = getCached('portfolio-categories')
+
+      if (cachedProjects && cachedCategories) {
+        if (isMounted) {
+          setItems(cachedProjects)
+          setCategories(cachedCategories)
+          setIsLoading(false)
+        }
+        return
+      }
+
       const [projectResult, categoryResult] = await Promise.all([
         supabase
           .from('lab_projects')
@@ -105,16 +109,18 @@ export function useAdminPortfolioPage() {
       }
 
       if (projectResult.error) {
-        setErrorMessage('Gagal mengambil data portfolio.')
+        showToast({ icon: 'error', title: 'Gagal mengambil data portfolio.' })
       } else {
         setItems(projectResult.data || [])
+        setCache('portfolio', projectResult.data || [])
       }
 
       if (categoryResult.error) {
-        setErrorMessage('Gagal mengambil data kategori lab.')
+        showToast({ icon: 'error', title: 'Gagal mengambil data kategori lab.' })
       } else {
         const nextCategories = categoryResult.data || []
         setCategories(nextCategories)
+        setCache('portfolio-categories', nextCategories)
 
         setForm((current) => ({
           ...current,
@@ -131,6 +137,7 @@ export function useAdminPortfolioPage() {
     return () => {
       isMounted = false
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleChange = (event) => {
@@ -142,10 +149,10 @@ export function useAdminPortfolioPage() {
     }))
   }
 
-  const handleArrayChange = (name, value) => {
+  const handleArrayChange = (name, value, separator = ',') => {
     setForm((current) => ({
       ...current,
-      [name]: parseLines(value),
+      [name]: value.split(separator).map((item) => item.trim()).filter(Boolean),
     }))
   }
 
@@ -156,8 +163,6 @@ export function useAdminPortfolioPage() {
       category_id: categories.find((item) => item.kind === 'category')?.id || '',
     })
     setEditingId('')
-    setMessage('')
-    setErrorMessage('')
   }
 
   const uploadFile = async (file, folder) => {
@@ -183,13 +188,11 @@ export function useAdminPortfolioPage() {
 
     if (!file) return false
     if (!file.type.startsWith('image/')) {
-      setErrorMessage('File utama harus berupa gambar.')
+      showToast({ icon: 'error', title: 'File utama harus berupa gambar.' })
       return false
     }
 
     setUploadingField('image_path')
-    setMessage('')
-    setErrorMessage('')
 
     try {
       const folder = slugify(form.title || 'project')
@@ -198,10 +201,10 @@ export function useAdminPortfolioPage() {
         ...current,
         image_path: filePath,
       }))
-      setMessage('Gambar utama berhasil diupload.')
+      showToast({ icon: 'success', title: 'Gambar utama berhasil diupload.' })
       return true
     } catch {
-      setErrorMessage('Gagal upload gambar utama. Pastikan policy storage benar.')
+      showToast({ icon: 'error', title: 'Gagal upload gambar utama. Pastikan policy storage benar.' })
       return false
     } finally {
       setUploadingField('')
@@ -216,13 +219,11 @@ export function useAdminPortfolioPage() {
 
     const invalidFile = files.find((file) => !file.type.startsWith('image/'))
     if (invalidFile) {
-      setErrorMessage('Semua screenshots harus berupa gambar.')
+      showToast({ icon: 'error', title: 'Semua screenshots harus berupa gambar.' })
       return false
     }
 
     setUploadingField('screenshots')
-    setMessage('')
-    setErrorMessage('')
 
     try {
       const folder = slugify(form.title || 'project')
@@ -236,10 +237,10 @@ export function useAdminPortfolioPage() {
         ...current,
         screenshots: [...current.screenshots, ...uploadedPaths],
       }))
-      setMessage(`${uploadedPaths.length} screenshot berhasil diupload.`)
+      showToast({ icon: 'success', title: `${uploadedPaths.length} screenshot berhasil diupload.` })
       return true
     } catch {
-      setErrorMessage('Gagal upload screenshots. Pastikan policy storage benar.')
+      showToast({ icon: 'error', title: 'Gagal upload screenshots. Pastikan policy storage benar.' })
       return false
     } finally {
       setUploadingField('')
@@ -256,8 +257,6 @@ export function useAdminPortfolioPage() {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setIsSaving(true)
-    setMessage('')
-    setErrorMessage('')
 
     const payload = {
       title: form.title.trim(),
@@ -267,8 +266,8 @@ export function useAdminPortfolioPage() {
       long_description: form.long_description.trim() || null,
       image_path: form.image_path.trim().replace(/^\/+/, ''),
       screenshots: form.screenshots.map((item) => item.replace(/^\/+/, '')),
-      tech_stack: form.tech_stack,
-      features: form.features,
+      tech_stack: form.tech_stack.split(',').map((s) => s.trim()).filter(Boolean),
+      features: form.features.split(',').map((s) => s.trim()).filter(Boolean),
       github_url: form.github_url.trim() || null,
       website_url: form.website_url.trim() || null,
       status: form.status,
@@ -284,12 +283,13 @@ export function useAdminPortfolioPage() {
     setIsSaving(false)
 
     if (error) {
-      setErrorMessage(error.message || 'Gagal menyimpan portfolio.')
+      showToast({ icon: 'error', title: error.message || 'Gagal menyimpan portfolio.' })
       return false
     }
 
-    setMessage(editingId ? 'Portfolio berhasil diperbarui.' : 'Portfolio berhasil ditambahkan.')
+    showToast({ icon: 'success', title: editingId ? 'Portfolio berhasil diperbarui.' : 'Portfolio berhasil ditambahkan.' })
     resetForm()
+    invalidateCache('portfolio')
     fetchProjects()
     return true
   }
@@ -304,30 +304,26 @@ export function useAdminPortfolioPage() {
       long_description: item.long_description || '',
       image_path: item.image_path || '',
       screenshots: item.screenshots || [],
-      tech_stack: item.tech_stack || [],
-      features: item.features || [],
+      tech_stack: (item.tech_stack || []).join(', '),
+      features: (item.features || []).join(', '),
       github_url: item.github_url || '',
       website_url: item.website_url || '',
       status: item.status || 'published',
       sort_order: item.sort_order || 0,
       is_active: Boolean(item.is_active),
     })
-    setMessage('')
-    setErrorMessage('')
   }
 
   const handleDelete = async (id) => {
-    setMessage('')
-    setErrorMessage('')
-
     const { error } = await supabase.from('lab_projects').delete().eq('id', id)
 
     if (error) {
-      setErrorMessage('Gagal menghapus portfolio.')
+      showToast({ icon: 'error', title: 'Gagal menghapus portfolio.' })
       return false
     }
 
-    setMessage('Portfolio berhasil dihapus.')
+    showToast({ icon: 'success', title: 'Portfolio berhasil dihapus.' })
+    invalidateCache('portfolio')
     fetchProjects()
     return true
   }
@@ -339,12 +335,13 @@ export function useAdminPortfolioPage() {
       .eq('id', item.id)
 
     if (error) {
-      setErrorMessage('Gagal mengubah status portfolio.')
+      showToast({ icon: 'error', title: 'Gagal mengubah status portfolio.' })
       return false
     }
 
+    invalidateCache('portfolio')
     fetchProjects()
-    setMessage(item.is_active ? 'Portfolio disembunyikan.' : 'Portfolio ditampilkan.')
+    showToast({ icon: 'success', title: item.is_active ? 'Portfolio disembunyikan.' : 'Portfolio ditampilkan.' })
     return true
   }
 
@@ -356,8 +353,6 @@ export function useAdminPortfolioPage() {
     isLoading,
     isSaving,
     uploadingField,
-    message,
-    errorMessage,
     handleChange,
     handleArrayChange,
     handleMainImageUpload,

@@ -9,11 +9,22 @@ import ProtectedRoute from '../features/auth/presentation/components/ProtectedRo
 import LoginPage from '../features/auth/presentation/pages/LoginPage'
 import JourneyPage from '../features/admin/presentation/pages/JourneyPage'
 import TypingTextPage from '../features/admin/presentation/pages/TypingTextPage'
+import BlogPage from '../features/admin/presentation/pages/BlogPage'
+import BlogUserPage from '../features/blog/page/BlogUserPage'
+import BlogDetailPage from '../features/blog/page/BlogDetailPage'
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <PortfolioPage />,
+  },
+  {
+    path: '/blog',
+    element: <BlogUserPage />,
+  },
+  {
+    path: '/blog/:slug',
+    element: <BlogDetailPage />,
   },
   {
     path: '/admin',
@@ -46,6 +57,10 @@ export const router = createBrowserRouter([
       {
         path: 'typing-text',
         element: <TypingTextPage />,
+      },
+         {
+        path: 'blog',
+        element: <BlogPage />,
       },
     ],
   },

@@ -1,10 +1,12 @@
-import { Home, User, Beaker, Mail } from "lucide-react";
+import { Home, User, Beaker, Mail, Newspaper } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const iconMap = {
   home: Home,
   about: User,
   lab: Beaker,
   contact: Mail,
+  blog: Newspaper,
 };
 
 function BottomNavigation({
@@ -13,6 +15,16 @@ function BottomNavigation({
   setActiveSection,
   isVisible = true,
 }) {
+  const navigate = useNavigate()
+
+  const handleClick = (item) => {
+    if (item.href) {
+      navigate(item.href)
+    } else {
+      setActiveSection(item.id)
+    }
+  }
+
   return (
     <div
       className={`
@@ -54,7 +66,7 @@ function BottomNavigation({
   <button
     key={item.id}
     type="button"
-    onClick={() => setActiveSection(item.id)}
+    onClick={() => handleClick(item)}
     className={`
       group relative flex min-h-14 min-w-14 items-center justify-center
       overflow-hidden rounded-full text-sm font-medium
