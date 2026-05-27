@@ -3,6 +3,8 @@ import { supabase } from '@/core/supabase'
 import { getCached, setCache, invalidateCache } from '@/core/cache'
 
 const STORAGE_BUCKET = 'portfolio-assets'
+const MAX_IMAGE_SIZE = 3 * 1024 * 1024
+const MAX_IMAGE_SIZE_LABEL = '3 MB'
 
 const initialForm = {
   title: '',
@@ -38,6 +40,8 @@ const slugify = (value) => (
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '') || 'project'
 )
+
+const isImageTooLarge = (file) => file.size > MAX_IMAGE_SIZE
 
 export const getPortfolioAssetUrl = (path) => {
   if (!path) return ''
@@ -192,6 +196,11 @@ export function useAdminPortfolioPage(showToast) {
       return false
     }
 
+    if (isImageTooLarge(file)) {
+      showToast({ icon: 'error', title: `Ukuran gambar utama maksimal ${MAX_IMAGE_SIZE_LABEL}.` })
+      return false
+    }
+
     setUploadingField('image_path')
 
     try {
@@ -220,6 +229,12 @@ export function useAdminPortfolioPage(showToast) {
     const invalidFile = files.find((file) => !file.type.startsWith('image/'))
     if (invalidFile) {
       showToast({ icon: 'error', title: 'Semua screenshots harus berupa gambar.' })
+      return false
+    }
+
+    const oversizedFile = files.find(isImageTooLarge)
+    if (oversizedFile) {
+      showToast({ icon: 'error', title: `Ukuran setiap screenshot maksimal ${MAX_IMAGE_SIZE_LABEL}.` })
       return false
     }
 

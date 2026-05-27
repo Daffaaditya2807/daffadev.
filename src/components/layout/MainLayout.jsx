@@ -1,5 +1,6 @@
 import Navbar from "../common/Navbar";
 import BottomNavigation from "../common/BottomNavigation";
+import Footer from "../common/Footer";
 
 function MainLayout({
   children,
@@ -42,6 +43,8 @@ function MainLayout({
       <main className="relative z-20 w-full">
         {children}
       </main>
+
+      <Footer />
     </div>
   );
 }

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/core/supabase'
-import { getCached, setCache, invalidateCache } from '@/core/cache'
+import { getCached, setCache, invalidateCache, invalidateCacheByPrefix } from '@/core/cache'
 
 const STORAGE_BUCKET = 'blog-assets'
+const MAX_THUMBNAIL_SIZE = 3 * 1024 * 1024
+const MAX_THUMBNAIL_SIZE_LABEL = '3 MB'
 
 const slugify = (text) =>
   text
@@ -18,6 +20,13 @@ const initialForm = {
   category: 'general',
   description: '',
   is_active: true,
+}
+
+const invalidateBlogCaches = () => {
+  invalidateCache('blogs')
+  invalidateCache('blogs-public')
+  invalidateCacheByPrefix('blog-detail:')
+  invalidateCacheByPrefix('blog-latest:')
 }
 
 export function useBlogPage(showToast) {
@@ -85,7 +94,19 @@ export function useBlogPage(showToast) {
 
   const handleThumbnailUpload = async (event) => {
     const file = event.target.files?.[0]
+    event.target.value = ''
+
     if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      showToast({ icon: 'error', title: 'Thumbnail harus berupa gambar.' })
+      return
+    }
+
+    if (file.size > MAX_THUMBNAIL_SIZE) {
+      showToast({ icon: 'error', title: `Ukuran thumbnail maksimal ${MAX_THUMBNAIL_SIZE_LABEL}.` })
+      return
+    }
 
     setUploadingThumbnail(true)
     const ext = file.name.split('.').pop()?.toLowerCase() || 'png'
@@ -133,11 +154,15 @@ export function useBlogPage(showToast) {
     if (!open) setForm(initialForm)
   }
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event, descriptionOverride) => {
     event.preventDefault()
     setIsSaving(true)
 
-    const payload = { ...form, slug: slugify(form.title) }
+    const payload = {
+      ...form,
+      description: descriptionOverride ?? form.description,
+      slug: slugify(form.title),
+    }
     let error
 
     if (editingId) {
@@ -158,7 +183,7 @@ export function useBlogPage(showToast) {
     showToast({ icon: 'success', title: editingId ? 'Blog berhasil diperbarui.' : 'Blog berhasil ditambahkan.' })
     setIsModalOpen(false)
     setForm(initialForm)
-    invalidateCache('blogs')
+    invalidateBlogCaches()
     fetchBlogs()
     return true
   }
@@ -177,7 +202,7 @@ export function useBlogPage(showToast) {
       showToast({ icon: 'error', title: 'Gagal menghapus blog.' })
     } else {
       showToast({ icon: 'success', title: 'Blog berhasil dihapus.' })
-      invalidateCache('blogs')
+      invalidateBlogCaches()
       fetchBlogs()
     }
 

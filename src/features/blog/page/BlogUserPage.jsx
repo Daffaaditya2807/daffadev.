@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { supabase } from '@/core/supabase'
 import { getCached, setCache } from '@/core/cache'
+import SEO from '@/components/common/SEO'
 import MainLayout from '@/components/layout/MainLayout'
 import CardBlog from '../components/CardBlog'
 
@@ -68,9 +69,21 @@ function BlogUserPage() {
       isNavbarOnHero={false}
       showBottomNav={true}
     >
-      <section className="mx-auto max-w-5xl px-4 py-24 sm:px-6">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Blog</h1>
+      <SEO
+        title="Blog"
+        description="Artikel seputar teknologi, project, tutorial, dan pengembangan diri dari Daffa Dev."
+        path="/blog"
+      />
+
+      <section className="mx-auto max-w-5xl px-4 py-4 sm:py-24 sm:px-6">
+        <div className="mb-8 flex flex-col gap-2 sm:gap-4">
+          <h1 className="text-3xl font-bold tracking-tight">Blog.</h1>
+          <p className="text-lg">
+          Tempat untuk berbagi pemikiran, pengalaman, dan pembelajaran seputar dunia teknologi, pengembangan diri.
+        </p>
+          <p className="text-sm text-gray-500">
+            Menampilkan {filteredBlogs.length} artikel
+          </p>
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/40" />
             <input

@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
+import SEO from '@/components/common/SEO'
 import Sidebar from '../components/partials/Sidebar'
 import Header from '../components/partials/Header'
 
@@ -49,6 +50,13 @@ const AdminLayout = () => {
 
   return (
     <div className="relative flex h-screen w-full overflow-hidden bg-[#0a0a0a] text-white">
+      <SEO
+        title="Admin"
+        description="Dashboard admin DaffaDev."
+        path="/admin"
+        noIndex
+      />
+
       <Sidebar />
 
       <div className="relative z-10 flex w-full flex-1 flex-col">

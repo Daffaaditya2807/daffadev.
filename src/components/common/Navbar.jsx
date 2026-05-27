@@ -1,4 +1,4 @@
-import { Home, User, Briefcase, Mail, Newspaper } from "lucide-react";
+import { Home, User, Briefcase, Mail, Newspaper, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const iconMap = {
@@ -7,7 +7,7 @@ const iconMap = {
   Lab: Briefcase,
   Contact: Mail,
   Blog: Newspaper,
-  Quiz: Mail
+  Quiz: Trophy,
 };
 
 function Navbar({

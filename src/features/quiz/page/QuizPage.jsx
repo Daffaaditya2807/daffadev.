@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, ArrowRight, LoaderCircle, RotateCcw, Trophy } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import SEO from '@/components/common/SEO'
 import CardQuestions from '../components/CardQuestions'
 
 const QUESTION_AMOUNT = 15
@@ -140,6 +141,12 @@ function QuizPage() {
 
   return (
     <main className="min-h-screen bg-[#030303] px-4 py-10 text-white sm:px-6">
+      <SEO
+        title="Hard Quiz"
+        description="Quiz hard multiple choice dengan kategori acak dari Open Trivia DB."
+        path="/quiz"
+      />
+
       <section className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-5xl flex-col justify-center">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>

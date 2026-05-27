@@ -3,11 +3,12 @@ import {
   ChevronRight,
   ExternalLink,
   Eye,
-  Rotate3D,
   Globe,
 } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
 import { useMemo, useState } from "react";
 import { useLabSection } from "../hooks/useLabSection";
+
 
 const PROJECTS_PER_PAGE = 6;
 
@@ -74,7 +75,7 @@ function LabSection({ selectedProject, setSelectedProject }) {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 p-5 sm:p-2 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {paginatedProjects.map((project) => (
               <ProjectCard
                 key={project.id}
@@ -142,7 +143,7 @@ function ProjectPagination({
 
 function SectionHeader() {
   return (
-    <div className="mb-16 text-center">
+    <div className="mb-8 text-center">
       <h2 className="mb-6 text-4xl font-bold text-white lg:text-5xl">
         Portofolio Proyek
       </h2>
@@ -157,31 +158,49 @@ function SectionHeader() {
 
 function CategoryFilter({ categories, activeFilter, onChangeFilter }) {
   return (
-    <div className="mb-12 flex flex-wrap justify-center gap-4">
-      {categories.map((category) => {
-        const Icon = category.icon;
-        const isActive = activeFilter === category.id;
+   
+    <div className="mb-12 w-screen relative left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 md:w-full">
+      <div 
+        className="
+          flex flex-nowrap items-center gap-3 
+          overflow-x-auto px-5 pb-4
+          md:flex-wrap md:justify-center md:px-0 md:pb-0
+          scrollbar-none [::-webkit-scrollbar]:hidden
+          touch-pan-x overscroll-x-contain
+        "
+        style={{
+          WebkitOverflowScrolling: "touch"
+        }}
+      >
+        {categories.map((category) => {
+          const Icon = category.icon;
+          const isActive = activeFilter === category.id;
 
-        return (
-          <button
-            key={category.id}
-            type="button"
-            onClick={() => onChangeFilter(category.id)}
-            className={`
-              flex items-center gap-2 rounded-full border px-6 py-3
-              transition-all duration-300
-              ${
-                isActive
-                  ? "border-white bg-gray-600 text-white shadow-lg shadow-gray-600/25"
-                  : "border-white/20 bg-white/5 text-gray-300 hover:border-white/30 hover:bg-white/10"
-              }
-            `}
-          >
-            <Icon className="h-5 w-5" />
-            {category.label}
-          </button>
-        );
-      })}
+          return (
+            <button
+              key={category.id}
+              type="button"
+              onClick={() => onChangeFilter(category.id)}
+              className={`
+                flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm
+                transition-all duration-200 active:scale-95
+                shrink-0 
+                ${
+                  isActive
+                    ? "border-white bg-white text-black font-semibold shadow-lg shadow-white/10"
+                    : "border-white/10 bg-[#161616] text-gray-400 hover:border-white/20 hover:text-white"
+                }
+              `}
+            >
+              {Icon && <Icon className="h-4 w-4" />}
+              <span className="whitespace-nowrap select-none">{category.label}</span>
+            </button>
+          );
+        })}
+        
+        {/* Spacer kanan ekstra agar tombol paling ujung tidak terpotong saat di-swipe mentok */}
+        <div className="w-5 shrink-0 md:hidden" />
+      </div>
     </div>
   );
 }
@@ -308,7 +327,7 @@ function ProjectLinks({ project, onSelectProject }) {
           className="rounded-full bg-white/10 p-2 transition-colors hover:bg-white/20"
           aria-label={`Buka GitHub ${project.title}`}
         >
-          <Rotate3D className="h-4 w-4 text-white" />
+          <FaGithub className="h-4 w-4 text-white" />
         </a>
       )}
 
@@ -339,7 +358,11 @@ function ProjectLinks({ project, onSelectProject }) {
 function ProjectModal({ project, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-      <div className="hide-scrollbar max-h-[90vh] max-w-6xl overflow-y-auto rounded-3xl border border-white/20 bg-white/10 backdrop-blur-md">
+      {/* PERUBAHAN UTAMA: 
+        Menambahkan [scrollbar-width:none] (untuk Firefox) 
+        dan [::-webkit-scrollbar]:hidden (untuk Chrome/Safari/Edge)
+      */}
+      <div className="max-h-[90vh] max-w-6xl overflow-y-auto rounded-3xl border border-white/20 bg-white/10 backdrop-blur-md scrollbar-none [::-webkit-scrollbar]:hidden">
         <div className="p-8">
           <ModalHeader project={project} onClose={onClose} />
 
@@ -473,7 +496,7 @@ function ProjectModalLinks({ links }) {
             rel="noopener noreferrer"
             className="flex items-center gap-2 rounded-full bg-gray-700 px-6 py-3 transition-colors hover:bg-gray-600"
           >
-            <Rotate3D className="h-5 w-5" />
+            <FaGithub className="h-5 w-5" />
             Source Code
           </a>
         )}

@@ -432,7 +432,7 @@ const PortfolioPage = () => {
 
               <div className="grid gap-4 md:grid-cols-[1fr_1.4fr]">
                 <div className="space-y-3 rounded-xl border border-white/10 bg-black/20 p-4">
-                  <div className="flex aspect-video items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-white/5">
+                  <div className="flex h-56 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-white/5 sm:h-72">
                     {form.image_path ? (
                       <img
                         src={getPortfolioAssetUrl(form.image_path)}
@@ -443,17 +443,6 @@ const PortfolioPage = () => {
                       <ImageIcon className="size-8 text-white/25" />
                     )}
                   </div>
-                  <FormField label="Main Image Path" htmlFor="image_path">
-                    <Input
-                      id="image_path"
-                      name="image_path"
-                      value={form.image_path}
-                      onChange={handleChange}
-                      required
-                      placeholder="lab-projects/project/image.png"
-                      className="h-10 border-white/10 bg-white/6 text-white placeholder:text-white/30 focus-visible:border-white/35 focus-visible:ring-white/10"
-                    />
-                  </FormField>
                   <input
                     id="main_image_upload"
                     type="file"
@@ -473,6 +462,18 @@ const PortfolioPage = () => {
                       {uploadingField === 'image_path' ? 'Mengupload...' : 'Upload Main Image'}
                     </label>
                   </Button>
+                  <p className="text-xs text-white/40">Maksimal 3 MB. Format PNG, JPG, WEBP, atau SVG.</p>
+                  <FormField label="Main Image Path" htmlFor="image_path">
+                    <Input
+                      id="image_path"
+                      name="image_path"
+                      value={form.image_path}
+                      onChange={handleChange}
+                      required
+                      placeholder="lab-projects/project/image.png"
+                      className="h-10 border-white/10 bg-white/6 text-white placeholder:text-white/30 focus-visible:border-white/35 focus-visible:ring-white/10"
+                    />
+                  </FormField>
                 </div>
 
                 <div className="space-y-3 rounded-xl border border-white/10 bg-black/20 p-4">

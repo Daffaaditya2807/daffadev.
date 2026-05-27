@@ -20,9 +20,6 @@ function AboutSection() {
   const { experienceRef, scrollProgress , profile , experiencess } = useAboutSection();
   const dynamicAboutImage = profile?.about_image ? getPublicImageUrl(profile.about_image) : memojiImage;
 
-console.log(experiencess)
-
-
   return (
     <section className="mx-auto max-w-6xl animate-fade-in">
       <h2 className="mb-12 text-center text-4xl font-bold text-white md:text-5xl">
@@ -118,38 +115,37 @@ function ExperienceItem({ experience, isActive }) {
   );
 }
 
-function ProfileImage({imageSrc}) {
+function ProfileImage({ imageSrc }) {
   return (
     <div className="flex justify-center">
       <div className="group relative">
-        <div className="relative h-100 w-80 overflow-hidden rounded-3xl border border-white/30 bg-linear-to-br from-white/20 via-white/10 to-white/5 shadow-2xl backdrop-blur-xl transition-all duration-500 hover:scale-105 hover:shadow-white/20">
-          <div className="absolute inset-0 rounded-3xl bg-linear-to-br from-gray-400/10 via-transparent to-blue-400/10" />
-
-          <div className="absolute left-2 top-2 h-16 w-16 rounded-full bg-white/20 blur-xl" />
-          <div className="absolute bottom-4 right-4 h-8 w-8 rounded-full bg-blue-400/30 blur-lg" />
-
-          <div className="relative z-10 flex h-full w-full items-center justify-center px-4">
+        
+        {/* Kontainer utama: Efek hover scale tetap ada, tapi lebih clean */}
+        <div className="relative h-100 w-80 overflow-hidden rounded-3xl transition-all duration-500 hover:scale-105">
+          <div className="relative z-10 flex h-full w-full items-center justify-center">
+            
+            {/* Gambar: Ditambahkan rounded-3xl dan object-cover agar sudut melengkung sempurna */}
             <img
               src={imageSrc}
               alt="Ilustrasi profil"
-              className="h-full w-full object-contain drop-shadow-2xl transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_18px_rgba(255,255,255,0.35)]"
+              className="h-full w-full rounded-3xl object-cover drop-shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
             />
-          </div>
-
-          <div className="absolute inset-0 rounded-3xl bg-linear-to-r from-gray-400/50 via-gray-400/50 to-gray-400/50 p-px opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-            <div className="h-full w-full rounded-3xl bg-transparent" />
           </div>
         </div>
 
-        <div className="absolute -inset-4 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+        {/* Efek partikel titik-titik di luar gambar (saya biarkan karena ini mempercantik hover) */}
+        <div className="pointer-events-none absolute -inset-4 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
           <div className="absolute left-4 top-4 h-2 w-2 animate-pulse rounded-full bg-gray-400" />
           <div className="absolute right-8 top-12 h-1 w-1 animate-ping rounded-full bg-gray-400" />
           <div className="absolute bottom-8 left-12 h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
           <div className="absolute bottom-4 right-4 h-1 w-1 animate-ping rounded-full bg-gray-300" />
         </div>
+        
       </div>
     </div>
   );
 }
 
 export default AboutSection;
+
+

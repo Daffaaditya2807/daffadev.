@@ -1,29 +1,24 @@
 import { useHomeSection } from "../../hooks/useHomeSection";
-import { Code2, Users, Layers3, Worm } from "lucide-react";
+import { FaGithub, FaLinkedinIn, FaInstagram } from "react-icons/fa";
 import HeroContent from "./HeroContent";
 import IntroCard from "./IntroCard";
 import TechStackSlider from "./TechStackSlider";
 const socialLinks = [
   {
-    Icon: Code2,
+    Icon: FaGithub, // 👈 Logo GitHub Resmi
     href: "https://github.com/Daffaaditya2807",
     label: "GitHub",
   },
   {
-    Icon: Layers3,
+    Icon: FaLinkedinIn, // 👈 Logo LinkedIn Resmi
     href: "https://www.linkedin.com/in/daffaadityarejasaruswanto/",
     label: "LinkedIn",
   },
   {
-    Icon: Users,
+    Icon: FaInstagram, // 👈 Logo Instagram Resmi
     href: "https://www.instagram.com/daafaditya/",
     label: "Instagram",
-  },
-  {
-    Icon: Worm,
-    href: "mailto:daffaaditya2912@gmail.com",
-    label: "Email",
-  },
+  }
 ];
 function HomeSection({ isLoaded = false, setActiveSection }) {
   const {
@@ -71,7 +66,7 @@ function SocialLinks({ isLoaded }) {
       `}
       style={{ transitionDelay: "1300ms" }}
     >
-      <h3 className="mb-4 text-center text-lg font-semibold text-white sm:text-xl">
+      <h3 className="mb-4 text-center text-lg font-semibold text-white sm:text-2xl">
         Sosial Media
       </h3>
 
@@ -83,9 +78,9 @@ function SocialLinks({ isLoaded }) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={label}
-            className="group rounded-full border border-white/20 bg-white/10 p-2 backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:rotate-12 hover:border-white/50 hover:bg-white/20 sm:p-3"
+            className="group rounded-full border border-white/20 bg-white/10 p-4 backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:rotate-12 hover:border-white/50 hover:bg-white/20 sm:p-5"
           >
-            <Icon className="h-5 w-5 text-gray-300 transition-colors duration-300 group-hover:text-white sm:h-6 sm:w-6" />
+            <Icon className="h-5 w-5 text-gray-300 transition-colors duration-300 group-hover:text-white sm:h-8 sm:w-8" />
           </a>
         ))}
       </div>

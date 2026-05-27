@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/core/supabase'
+import SEO from '@/components/common/SEO'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -51,6 +52,13 @@ const LoginPage = () => {
 
   return (
     <main className="min-h-screen bg-black px-4 py-8 text-white sm:px-6 lg:px-8">
+      <SEO
+        title="Login Admin"
+        description="Halaman login admin DaffaDev."
+        path="/login"
+        noIndex
+      />
+
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center justify-center">
         <div className="grid w-full overflow-hidden rounded-2xl border border-white/10 bg-white/4 shadow-2xl shadow-black/50 backdrop-blur-xl lg:grid-cols-[1fr_0.9fr]">
           <section className="hidden min-h-155 flex-col justify-between border-r border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.18),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.10),rgba(255,255,255,0.02))] p-10 lg:flex">

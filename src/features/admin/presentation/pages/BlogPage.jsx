@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Plus, Pencil, Trash2, X, Upload, ChevronLeft, ChevronRight } from 'lucide-react'
-import ReactQuill from 'react-quill-new'
+import ReactQuill, { Quill } from 'react-quill-new'
+import ImageResize from 'quill-resize-image'
 import 'react-quill-new/dist/quill.snow.css'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,7 +20,48 @@ import { useBlogPage } from '../hooks/useBlogPage'
 
 const CATEGORY_OPTIONS = ['general', 'teknologi', 'tutorial', 'opini', 'project']
 
+window.Quill = Quill
+
 const FONT_SIZE_OPTIONS = ['10px', '12px', '14px', '16px', '18px', '20px', '24px', '32px', '48px']
+const SizeStyle = Quill.import('attributors/style/size')
+SizeStyle.whitelist = FONT_SIZE_OPTIONS
+Quill.register(SizeStyle, true)
+
+const BaseImage = Quill.import('formats/image')
+const IMAGE_ATTRIBUTES = ['alt', 'height', 'width', 'style']
+
+class ResizableImage extends BaseImage {
+  static formats(domNode) {
+    return IMAGE_ATTRIBUTES.reduce((formats, attribute) => {
+      if (domNode.hasAttribute(attribute)) {
+        formats[attribute] = domNode.getAttribute(attribute)
+      }
+
+      return formats
+    }, {})
+  }
+
+  format(name, value) {
+    if (IMAGE_ATTRIBUTES.includes(name)) {
+      if (value) {
+        this.domNode.setAttribute(name, value)
+      } else {
+        this.domNode.removeAttribute(name)
+      }
+
+      return
+    }
+
+    super.format(name, value)
+  }
+}
+
+ResizableImage.blotName = 'image'
+ResizableImage.tagName = 'IMG'
+Quill.register(ResizableImage, true)
+
+// Daftarkan modul baru (tidak perlu pakai .default lagi)
+Quill.register('modules/imageResize', ImageResize)
 
 const quillModules = {
   toolbar: [
@@ -34,6 +76,10 @@ const quillModules = {
     ['link', 'image'],
     ['clean'],
   ],
+  imageResize: {
+    parchment: Quill.import('parchment'),
+    modules: ['Resize', 'DisplaySize', 'Toolbar']
+  }
 }
 
 const BlogPage = () => {
@@ -60,6 +106,7 @@ const BlogPage = () => {
     setIsDeleteDialogOpen,
   } = useBlogPage(showToast)
 
+  const quillRef = useRef(null)
   const [currentPage, setCurrentPage] = useState(1)
   const PAGE_SIZE = 10
   const totalPages = Math.max(1, Math.ceil(blogs.length / PAGE_SIZE))
@@ -80,6 +127,11 @@ const BlogPage = () => {
       month: 'long',
       year: 'numeric',
     })
+  }
+
+  const handleFormSubmit = (event) => {
+    const editorHtml = quillRef.current?.getEditor?.().root?.innerHTML
+    return handleSubmit(event, editorHtml)
   }
 
   return (
@@ -197,7 +249,7 @@ const BlogPage = () => {
       <Dialog.Root open={isModalOpen} onOpenChange={handleModalOpenChange}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
-          <Dialog.Content aria-describedby={undefined} className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-3xl max-h-[90vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Dialog.Content aria-describedby={undefined} className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-3xl max-h-[90vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none scrollbar-none [&::-webkit-scrollbar]:hidden">
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
               <Dialog.Title className="text-base font-semibold text-white">
                 {editingId ? 'Edit Blog' : 'Tambah Blog'}
@@ -209,7 +261,7 @@ const BlogPage = () => {
               </Dialog.Close>
             </div>
 
-            <form onSubmit={handleSubmit} className="px-5 py-5 space-y-4">
+            <form onSubmit={handleFormSubmit} className="px-5 py-5 space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-white/80">Judul</label>
                 <Input
@@ -224,22 +276,32 @@ const BlogPage = () => {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-white/80">Thumbnail</label>
-                <div className="flex items-center gap-3">
-                  <label className="flex h-10 cursor-pointer items-center gap-2 rounded-md border border-white/10 bg-white/6 px-4 text-sm text-white/70 hover:bg-white/10 transition">
+                <div className="space-y-3 rounded-xl border border-white/10 bg-black/20 p-4">
+                  <div className="flex h-48 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-white/5 sm:h-64">
+                    {form.thumbnail ? (
+                      <img
+                        src={form.thumbnail}
+                        alt="Thumbnail preview"
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    ) : (
+                      <Upload className="size-8 text-white/25" />
+                    )}
+                  </div>
+
+                  <label className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-white/10 bg-white/6 px-4 text-sm text-white/70 transition hover:bg-white/10">
                     <Upload className="size-4" />
-                    Pilih Gambar
+                    {uploadingThumbnail ? 'Mengupload...' : 'Pilih Gambar'}
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleThumbnailUpload}
+                      disabled={uploadingThumbnail}
                       className="hidden"
                     />
                   </label>
-                  {form.thumbnail && (
-                    <img src={form.thumbnail} alt="preview" className="h-10 w-16 rounded object-cover border border-white/10" />
-                  )}
+                  <p className="text-xs text-white/40">Maksimal 3 MB. Format PNG, JPG, WEBP, atau SVG.</p>
                 </div>
-                {uploadingThumbnail && <p className="text-xs text-white/50">Mengupload...</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -273,10 +335,12 @@ const BlogPage = () => {
                 <label className="text-sm font-medium text-white/80">Deskripsi</label>
                 <div className="blog-quill-editor">
                   <ReactQuill
+                    ref={quillRef}
                     theme="snow"
                     value={form.description}
                     onChange={handleDescriptionChange}
                     modules={quillModules}
+                    useSemanticHTML={false}
                     placeholder="Tulis konten blog di sini..."
                   />
                 </div>

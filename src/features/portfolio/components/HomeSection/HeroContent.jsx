@@ -13,7 +13,8 @@ const getPublicImageUrl = (path) => {
     return path;
   }
 
-  return supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+  return supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data
+    .publicUrl;
 };
 
 function HeroContent({ profile, onDownloadPortfolio, onContactClick }) {
@@ -25,46 +26,50 @@ function HeroContent({ profile, onDownloadPortfolio, onContactClick }) {
   const heroTextTwo =
     profile?.text_hero_2 ||
     "Menggabungkan mobile development, frontend, dan backend untuk membuat produk digital yang berjalan stabil dan terlihat profesional.";
-    
+
   const dynamicHeroImage =
     getPublicImageUrl(profile?.hero_image_rgb) ||
     getPublicImageUrl(profile?.hero_image_bw) ||
     heroImage;
 
   return (
-<div
-  id="home-hero"
-  className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden bg-[#0a0a0a]"
->
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_45%,rgba(255,255,255,0.18),transparent_28%),radial-gradient(circle_at_72%_35%,rgba(255,255,255,0.13),transparent_22%),linear-gradient(135deg,#050505_0%,#111111_45%,#000000_100%)]" />
+    <div
+      id="home-hero"
+      className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden bg-[#0a0a0a]"
+    >
+     <div className="absolute inset-0 z-0 hidden lg:block bg-[radial-gradient(circle_at_35%_45%,rgba(255,255,255,0.18),transparent_28%),radial-gradient(circle_at_72%_35%,rgba(255,255,255,0.13),transparent_22%),linear-gradient(135deg,#050505_0%,#111111_45%,#000000_100%)]" />
       <div className="absolute -left-20 top-16 h-80 w-80 rounded-full border border-white/10" />
       <div className="absolute left-1/3 top-14 h-120 w-120 rounded-full border-[5rem] border-white/4" />
 
       {/* Mobile Layout */}
-      <div className="relative z-10 flex min-h-screen flex-col px-5 pt-24 lg:hidden">
-        <h1 className="text-center text-[4.5rem] font-black uppercase leading-none tracking-normal text-white sm:text-[7rem] md:text-[9rem]">
-          {heroName}
-        </h1>
+      <div className="relative z-10 flex h-auto flex-col px-5 pt-24 lg:hidden">
+    <h1 className="text-center text-[5.5rem] font-black uppercase leading-none tracking-normal text-white sm:text-[7rem] md:text-[9rem] font-display">
+  {heroName}
+</h1>
 
-        <div className="relative z-20 -mt-6 flex justify-center sm:-mt-8">
+        {/* Wrapper gambar + gradasi */}
+        <div className="relative z-20 -mt-6 flex justify-center sm:-mt-8  overflow-hidden">
           <img
             src={dynamicHeroImage}
             alt={heroAlt}
-            loading="lazy"
-            // 👇 Perubahan ada di sini: penambahan class transisi dan hover
+            loading="eager"
             className="h-105 max-w-none object-contain opacity-100 grayscale contrast-110 transition-all duration-500 hover:grayscale-0 hover:contrast-100 sm:h-130"
           />
+
+          {/* Efek Gradasi Hitam di bawah gambar (Meniru logic Desktop) */}
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent pointer-events-none" />
         </div>
 
-        <div className="relative z-30 mt-4 grid gap-6 pb-12 text-center sm:mx-auto sm:max-w-xl">
+        {/* Container Teks dan Tombol */}
+        <div className="relative z-30 -mt-2 grid gap-6 pb-12 text-center sm:mx-auto sm:max-w-xl">
           <div>
-            <p className="text-sm leading-relaxed text-white sm:text-base">
-              {heroTextOne}
+            <p className="text-lg leading-relaxed text-white sm:text-base">
+              {heroTextOne} 
             </p>
           </div>
 
           <div>
-            <p className="mb-4 text-sm leading-relaxed text-white sm:text-base">
+            <p className="mb-4 text-lg leading-relaxed text-white sm:text-base">
               {heroTextTwo}
             </p>
 
@@ -74,7 +79,6 @@ function HeroContent({ profile, onDownloadPortfolio, onContactClick }) {
               className="group inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition-all duration-300 hover:scale-105 hover:bg-gray-200"
             >
               Download Porto
-
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white transition-transform duration-300 group-hover:rotate-45">
                 <ArrowUpRight className="h-4 w-4" />
               </span>
@@ -85,28 +89,24 @@ function HeroContent({ profile, onDownloadPortfolio, onContactClick }) {
 
       {/* Desktop Layout */}
       <div className="relative z-10 hidden min-h-170 lg:block">
-        <h1 className="absolute left-4 right-4 top-10 z-10 text-center text-[11rem] font-black uppercase leading-none tracking-normal text-white xl:text-[13rem]">
+        <h1 className="absolute left-4 right-4 top-10 z-10 text-center text-[11rem] font-black uppercase leading-none tracking-normal text-white xl:text-[13rem] font-display">
           {heroName}
         </h1>
 
         <img
           src={dynamicHeroImage}
-          loading="lazy"
+          loading="eager"
           alt={heroAlt}
           // 👇 Perubahan ada di sini: penambahan class transisi dan hover
           className="absolute bottom-0 left-1/2 z-20 h-[88%] max-w-none -translate-x-1/2 object-contain opacity-100 grayscale contrast-110 transition-all duration-500 hover:grayscale-0 hover:contrast-100"
         />
 
-<div className="absolute inset-x-0 bottom-0 z-30 h-1/2 bg-linear-to-t from-[#0a0a0a] via-[#0a0a0a]/35 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 z-30 h-1/2 bg-linear-to-t from-[#0a0a0a] via-[#0a0a0a]/35 to-transparent pointer-events-none" />
 
         <div className="absolute left-10 top-[46%] z-40 max-w-xs text-left">
-          <p className="text-base leading-relaxed text-white">
-            {heroTextOne}
-          </p>
+          <p className="text-base leading-relaxed text-white">{heroTextOne}</p>
 
           <div className="mt-5 flex items-center gap-3">
-
-
             <button
               type="button"
               onClick={onContactClick}
@@ -129,7 +129,6 @@ function HeroContent({ profile, onDownloadPortfolio, onContactClick }) {
             className="group inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition-all duration-300 hover:scale-105 hover:bg-gray-200"
           >
             Download Porto
-
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white transition-transform duration-300 group-hover:rotate-45">
               <ArrowUpRight className="h-4 w-4" />
             </span>
