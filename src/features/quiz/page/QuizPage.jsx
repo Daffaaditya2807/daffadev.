@@ -85,9 +85,6 @@ function QuizPage() {
 
       while (triedCategories.length < TRIVIA_CATEGORIES.length) {
         const category = getRandomCategory(triedCategories)
-        if (navigator.userAgent === 'ReactSnap') {
-            return;
-          }
         const triviaUrl = `https://opentdb.com/api.php?amount=${QUESTION_AMOUNT}&category=${category}&difficulty=hard&type=multiple`
 
         triedCategories.push(category)
