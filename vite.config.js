@@ -6,9 +6,6 @@ import { fileURLToPath, URL } from 'node:url'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  build: {
-    target: 'es2015' // <-- Tambahkan bagian ini
-  },
   server: {
     host: '127.0.0.1', // 👈 Memaksa Vite berjalan di IP loopback ini
     port: 5173,
