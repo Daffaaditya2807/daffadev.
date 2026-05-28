@@ -30,8 +30,8 @@ const {
   return (
     <>
       <SEO
-        title="Daffa Aditya R. R. "
-        description="Portfolio Daffa Dev berisi project, tech stack, pengalaman, dan kontak."
+        title="Daffa Aditya R. R. | Mobile & Website Developer"
+        description="Portfolio Daffa Aditya R. R., seorang Mobile dan Website Developer yang antusias mempelajari hal baru, membangun aplikasi modern, serta mengembangkan solusi digital yang kreatif dan bermanfaat."
         path="/"
       />
 

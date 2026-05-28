@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 
-const siteName = 'daffadev'
+const siteName = 'Daffa Aditya R. R. | Mobile & Website Developer'
 const siteUrl = (import.meta.env.VITE_SITE_URL || window.location.origin).replace(/\/$/, '')
-const defaultImage = `${siteUrl}/daffadev.png`
-const defaultDescription = 'Portfolio, project, blog, dan eksperimen teknologi dari Daffa Dev.'
+const defaultImage = `${siteUrl}/port-square.png`
+const defaultDescription = 'Portfolio Daffa Aditya R. R., seorang Mobile dan Website Developer yang antusias mempelajari hal baru, membangun aplikasi modern, serta mengembangkan solusi digital yang kreatif dan bermanfaat.'
 
 const setMeta = ({ key, value, attribute = 'name' }) => {
   if (!value) return
