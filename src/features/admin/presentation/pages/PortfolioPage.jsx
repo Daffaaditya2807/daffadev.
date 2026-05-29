@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import { ChevronLeft, ChevronRight, ImageIcon, Pencil, Plus, RotateCcw, Trash2, Upload, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ImageIcon, LoaderCircle, Pencil, Plus, RotateCcw, Trash2, Upload, X } from 'lucide-react'
 import { useOutletContext } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -257,7 +257,10 @@ const PortfolioPage = () => {
       <Dialog.Root open={isModalOpen} onOpenChange={handleModalOpenChange}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[92vh] w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Dialog.Content
+            onInteractOutside={(event) => event.preventDefault()}
+            className="fixed left-1/2 top-1/2 z-50 max-h-[92vh] w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-black/95 px-5 py-4">
               <Dialog.Title className="text-base font-semibold text-white">
                 {editingId ? 'Edit Portfolio' : 'Tambah Portfolio'}
@@ -284,17 +287,6 @@ const PortfolioPage = () => {
                     onChange={handleChange}
                     required
                     placeholder="Titu Laundry"
-                    className="h-10 border-white/10 bg-white/6 text-white placeholder:text-white/30 focus-visible:border-white/35 focus-visible:ring-white/10"
-                  />
-                </FormField>
-
-                <FormField label="Sort Order" htmlFor="sort_order">
-                  <Input
-                    id="sort_order"
-                    name="sort_order"
-                    type="number"
-                    value={form.sort_order}
-                    onChange={handleChange}
                     className="h-10 border-white/10 bg-white/6 text-white placeholder:text-white/30 focus-visible:border-white/35 focus-visible:ring-white/10"
                   />
                 </FormField>
@@ -371,17 +363,6 @@ const PortfolioPage = () => {
                     <option value="archived" className="bg-black text-white">Archived</option>
                   </select>
                 </FormField>
-
-                <label className="mt-7 flex h-10 items-center gap-3 rounded-lg border border-white/10 bg-white/6 px-3 py-2 text-sm text-white/75">
-                  <input
-                    name="is_active"
-                    type="checkbox"
-                    checked={form.is_active}
-                    onChange={handleChange}
-                    className="size-4 accent-white"
-                  />
-                  Tampilkan di halaman depan
-                </label>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
@@ -470,8 +451,9 @@ const PortfolioPage = () => {
                       value={form.image_path}
                       onChange={handleChange}
                       required
+                      disabled
                       placeholder="lab-projects/project/image.png"
-                      className="h-10 border-white/10 bg-white/6 text-white placeholder:text-white/30 focus-visible:border-white/35 focus-visible:ring-white/10"
+                      className="h-10 border-white/10 bg-white/6 text-white placeholder:text-white/30 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:border-white/35 focus-visible:ring-white/10"
                     />
                   </FormField>
                 </div>
@@ -537,6 +519,17 @@ const PortfolioPage = () => {
                 </div>
               </div>
 
+              <label className="flex w-max items-center gap-3 rounded-lg border border-white/10 bg-white/6 px-3 py-2 text-sm text-white/75">
+                <input
+                  name="is_active"
+                  type="checkbox"
+                  checked={form.is_active}
+                  onChange={handleChange}
+                  className="size-4 accent-white"
+                />
+                Tampilkan di halaman depan
+              </label>
+
               <div className="flex flex-wrap justify-end gap-2 border-t border-white/10 pt-4">
                 <Button
                   type="button"
@@ -552,7 +545,13 @@ const PortfolioPage = () => {
                   disabled={isSaving || Boolean(uploadingField)}
                   className="h-10 bg-white px-4 text-black hover:bg-white/90"
                 >
-                  <Plus className="size-4" />
+                  {isSaving ? (
+                    <LoaderCircle className="size-4 animate-spin" />
+                  ) : editingId ? (
+                    <Pencil className="size-4" />
+                  ) : (
+                    <Plus className="size-4" />
+                  )}
                   {isSaving ? 'Menyimpan...' : editingId ? 'Update Portfolio' : 'Tambah Portfolio'}
                 </Button>
               </div>

@@ -28,6 +28,7 @@ export function useAboutSection() {
         const { data, error } = await supabase
           .from("journeys")
           .select("*")
+          .eq("is_active", true)
           .order("date_start", { ascending: false });
   
         if (!error && data) {

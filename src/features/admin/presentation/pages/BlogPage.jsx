@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import * as Dialog from '@radix-ui/react-dialog'
-import { Plus, Pencil, Trash2, X, Upload, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, Upload, ChevronLeft, ChevronRight, LoaderCircle, Save } from 'lucide-react'
 import ReactQuill, { Quill } from 'react-quill-new'
 import ImageResize from 'quill-resize-image'
 import 'react-quill-new/dist/quill.snow.css'
@@ -249,7 +249,11 @@ const BlogPage = () => {
       <Dialog.Root open={isModalOpen} onOpenChange={handleModalOpenChange}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
-          <Dialog.Content aria-describedby={undefined} className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-3xl max-h-[90vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none scrollbar-none [&::-webkit-scrollbar]:hidden">
+          <Dialog.Content
+            aria-describedby={undefined}
+            onInteractOutside={(event) => event.preventDefault()}
+            className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-3xl max-h-[90vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none scrollbar-none [&::-webkit-scrollbar]:hidden"
+          >
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
               <Dialog.Title className="text-base font-semibold text-white">
                 {editingId ? 'Edit Blog' : 'Tambah Blog'}
@@ -364,6 +368,13 @@ const BlogPage = () => {
                   </Button>
                 </Dialog.Close>
                 <Button type="submit" disabled={isSaving} className="h-10 bg-white px-6 text-black hover:bg-white/90">
+                  {isSaving ? (
+                    <LoaderCircle className="size-4 animate-spin" />
+                  ) : editingId ? (
+                    <Pencil className="size-4" />
+                  ) : (
+                    <Save className="size-4" />
+                  )}
                   {isSaving ? 'Menyimpan...' : editingId ? 'Update Blog' : 'Simpan Blog'}
                 </Button>
               </div>

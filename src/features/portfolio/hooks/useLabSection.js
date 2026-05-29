@@ -50,8 +50,7 @@ export function useLabSection({ selectedProject, setSelectedProject }) {
           .select("*")
           .eq("is_active", true)
           .eq("status", "published")
-          .order("sort_order", { ascending: true })
-          .order("created_at", { ascending: true }),
+          .order("created_at", { ascending: false }),
       ]);
 
       if (!isMounted) {

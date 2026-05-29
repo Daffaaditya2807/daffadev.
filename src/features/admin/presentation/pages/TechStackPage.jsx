@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import { ChevronLeft, ChevronRight, Pencil, Plus, RotateCcw, Trash2, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, LoaderCircle, Pencil, Plus, RotateCcw, Trash2, X } from 'lucide-react'
 import { useOutletContext } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -260,7 +260,10 @@ const TechStackPage = () => {
       <Dialog.Root open={isModalOpen} onOpenChange={handleModalOpenChange}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none">
+          <Dialog.Content
+            onInteractOutside={(event) => event.preventDefault()}
+            className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none"
+          >
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
               <Dialog.Title className="text-base font-semibold text-white">
                 {editingId ? 'Edit Tech Stack' : 'Tambah Tech Stack'}
@@ -387,7 +390,13 @@ const TechStackPage = () => {
                   disabled={isSaving}
                   className="h-10 bg-white px-4 text-black hover:bg-white/90"
                 >
-                  <Plus className="size-4" />
+                  {isSaving ? (
+                    <LoaderCircle className="size-4 animate-spin" />
+                  ) : editingId ? (
+                    <Pencil className="size-4" />
+                  ) : (
+                    <Plus className="size-4" />
+                  )}
                   {isSaving ? 'Menyimpan...' : editingId ? 'Update Stack' : 'Tambah Stack'}
                 </Button>
               </div>

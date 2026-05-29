@@ -19,7 +19,6 @@ const initialForm = {
   github_url: '',
   website_url: '',
   status: 'published',
-  sort_order: 0,
   is_active: true,
 }
 
@@ -65,8 +64,7 @@ export function useAdminPortfolioPage(showToast) {
     const { data, error } = await supabase
       .from('lab_projects')
       .select('*, type:lab_categories!lab_projects_type_id_fkey(id,label), category:lab_categories!lab_projects_category_id_fkey(id,label)')
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: true })
+      .order('created_at', { ascending: false })
 
     if (error) {
       showToast({ icon: 'error', title: 'Gagal mengambil data portfolio.' })
@@ -100,8 +98,7 @@ export function useAdminPortfolioPage(showToast) {
         supabase
           .from('lab_projects')
           .select('*, type:lab_categories!lab_projects_type_id_fkey(id,label), category:lab_categories!lab_projects_category_id_fkey(id,label)')
-          .order('sort_order', { ascending: true })
-          .order('created_at', { ascending: true }),
+          .order('created_at', { ascending: false }),
         supabase
           .from('lab_categories')
           .select('*')
@@ -149,7 +146,7 @@ export function useAdminPortfolioPage(showToast) {
 
     setForm((current) => ({
       ...current,
-      [name]: type === 'checkbox' ? checked : name === 'sort_order' ? Number(value) : value,
+      [name]: type === 'checkbox' ? checked : value,
     }))
   }
 
@@ -286,7 +283,6 @@ export function useAdminPortfolioPage(showToast) {
       github_url: form.github_url.trim() || null,
       website_url: form.website_url.trim() || null,
       status: form.status,
-      sort_order: Number(form.sort_order) || 0,
       is_active: form.is_active,
     }
 
@@ -324,7 +320,6 @@ export function useAdminPortfolioPage(showToast) {
       github_url: item.github_url || '',
       website_url: item.website_url || '',
       status: item.status || 'published',
-      sort_order: item.sort_order || 0,
       is_active: Boolean(item.is_active),
     })
   }
