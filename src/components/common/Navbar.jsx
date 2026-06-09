@@ -41,7 +41,7 @@ function Navbar({
         <span className="text-white font-display">⚡</span>
         <span
           className={`
-            overflow-hidden whitespace-nowrap text-white font-display
+            hidden overflow-hidden whitespace-nowrap text-white font-display md:inline-block
             transition-all duration-500 ease-out
             ${
               isNavbarOnHero
