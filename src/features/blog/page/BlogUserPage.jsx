@@ -12,6 +12,7 @@ const navItems = [
   { id: "lab", label: "Lab", href: "/" },
   { id: "contact", label: "Contact", href: "/" },
   { id: "blog", label: "Blog" },
+  { id: "quiz", label: "Quiz", href:"/quiz" },
 ]
 
 const PAGE_SIZE = 10

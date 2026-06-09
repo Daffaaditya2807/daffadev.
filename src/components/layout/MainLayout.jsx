@@ -1,6 +1,7 @@
 import Navbar from "../common/Navbar";
-import BottomNavigation from "../common/BottomNavigation";
+// import BottomNavigation from "../common/BottomNavigation";
 import Footer from "../common/Footer";
+import SpotifyWidget from "../common/SpotifyWidget";
 
 function MainLayout({
   children,
@@ -9,8 +10,8 @@ function MainLayout({
   scrollToSection,
   isLoaded,
   isNavbarOnHero,
-  showBottomNav,
-  selectedProject,
+  // showBottomNav,
+  // selectedProject,
 }) {
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden text-white">
@@ -33,18 +34,19 @@ function MainLayout({
         isNavbarOnHero={isNavbarOnHero}
       />
       
-      <BottomNavigation
+      {/* <BottomNavigation
         navItems={navItems}
         activeSection={activeSection}
         setActiveSection={scrollToSection}
         isVisible={showBottomNav && !selectedProject}
-      />
+      /> */}
 
       <main className="relative z-20 w-full">
         {children}
       </main>
 
       <Footer />
+      <SpotifyWidget />
     </div>
   );
 }

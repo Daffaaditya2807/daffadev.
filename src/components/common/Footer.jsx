@@ -31,7 +31,7 @@ function Footer() {
        Mengubah py-12 menjadi pt-12 pb-28 di mobile, dan pt-12 md:pb-16 di desktop.
        pb-28 (padding-bottom 112px) memastikan teks terdorong ke atas melewati batas tinggi BottomNavigation.
     */
-    <footer className="relative z-20 border-t border-white/5 bg-[#070707] pt-12 pb-28 md:pb-16 px-6 text-center">
+    <footer className="relative z-20 border-t border-white/5 bg-[#070707] pt-12 pb-24 md:pb-8 px-6 text-center">
       <div className="mx-auto max-w-4xl flex flex-col items-center gap-6">
         
         {/* Nama & Status */}
@@ -73,7 +73,7 @@ function Footer() {
   </div>
 
   {/* Teks Copyright sekarang berada tepat di bawah ikon dan otomatis rata tengah */}
-  <p className="text-xs text-gray-500 mt-2 select-none pb-10">
+  <p className="text-xs text-gray-500 mt-2 select-none pb-2">
     &copy; {currentYear} Daffa. All Rights Reserved.
   </p>
 </div>

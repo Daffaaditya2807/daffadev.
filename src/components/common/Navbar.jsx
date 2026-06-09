@@ -22,25 +22,44 @@ function Navbar({
     <nav
       className={`
         fixed left-0 right-0 top-0 z-50 flex items-center justify-between
-        px-5 py-4 md:px-8 md:py-6
+        px-5 py-2.5 md:px-8 md:py-3.5
+        translate-y-0 opacity-100
         transition-all duration-700 ease-out
         ${
           isNavbarOnHero
-            ? "translate-y-0 bg-transparent opacity-100"
-            : "-translate-y-full bg-transparent opacity-0 pointer-events-none"
+            ? "bg-transparent"
+            : " bg-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.24)] backdrop-blur-2xl backdrop-saturate-150"
         }
       `}
     >
       <div
         className={`
-          text-3xl font-bold transition-all duration-1000
+          flex items-center text-3xl font-bold transition-all duration-1000
           ${isLoaded ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0"}
         `}
       >
-        <span className="text-white">⚡</span>
+        <span className="text-white font-display">⚡</span>
+        <span
+          className={`
+            overflow-hidden whitespace-nowrap text-white font-display
+            transition-all duration-500 ease-out
+            ${
+              isNavbarOnHero
+                ? "ml-0 max-w-0 -translate-x-2 opacity-0"
+                : "ml-1 max-w-40 translate-x-0 opacity-100"
+            }
+          `}
+        >
+          daffa.
+        </span>
       </div>
 
-      <div className="flex items-center space-x-6 rounded-full bg-transparent px-4 py-3 transition-all duration-700 ease-out md:space-x-8">
+      <div
+        className={`
+          flex items-center space-x-6 rounded-full bg-transparent px-3 py-2
+          transition-all duration-700 ease-out md:space-x-8
+        `}
+      >
         {navItems.map((item, index) => {
           const Icon = iconMap[item.label];
           const isActive = activeSection === item.id;
