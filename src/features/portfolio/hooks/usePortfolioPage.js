@@ -3,13 +3,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export function usePortfolioPage(navItems) {
   const [activeSection, setActiveSection] = useState("home");
   const [isLoaded, setIsLoaded] = useState(false);
-  const [showBottomNav, setShowBottomNav] = useState(false);
   const [isNavbarOnHero, setIsNavbarOnHero] = useState(true);
-  const [selectedProject, setSelectedProject] = useState(null);
 
   const activeSectionRef = useRef("home");
   const isNavbarOnHeroRef = useRef(true);
-  const showBottomNavRef = useRef(false);
   const tickingRef = useRef(false);
 
   useEffect(() => {
@@ -50,24 +47,17 @@ export function usePortfolioPage(navItems) {
       const navbarHeight = 80;
 
       let nextIsNavbarOnHero = false;
-      let nextShowBottomNav = true;
 
       if (homeHero) {
         const heroBottom =
           homeHero.getBoundingClientRect().bottom + window.scrollY;
 
         nextIsNavbarOnHero = window.scrollY < heroBottom - navbarHeight;
-        nextShowBottomNav = !nextIsNavbarOnHero;
       }
 
       if (nextIsNavbarOnHero !== isNavbarOnHeroRef.current) {
         isNavbarOnHeroRef.current = nextIsNavbarOnHero;
         setIsNavbarOnHero(nextIsNavbarOnHero);
-      }
-
-      if (nextShowBottomNav !== showBottomNavRef.current) {
-        showBottomNavRef.current = nextShowBottomNav;
-        setShowBottomNav(nextShowBottomNav);
       }
     };
 
@@ -110,10 +100,7 @@ export function usePortfolioPage(navItems) {
   return {
     activeSection,
     isLoaded,
-    showBottomNav,
     isNavbarOnHero,
-    selectedProject,
-    setSelectedProject,
     scrollToSection,
   };
 }

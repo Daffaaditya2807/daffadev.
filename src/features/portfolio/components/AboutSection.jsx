@@ -16,12 +16,11 @@ const getPublicImageUrl = (path) => {
 };
 
 function AboutSection() {
-  const { experienceRef, scrollProgress, profile, experiences } =
-    useAboutSection();
+  const { experienceRef, profile, experiences } = useAboutSection();
 
-const dynamicAboutImage = profile?.about_image
-  ? getPublicImageUrl(profile.about_image)
-  : memojiImage;
+  const dynamicAboutImage = profile?.about_image
+    ? getPublicImageUrl(profile.about_image)
+    : memojiImage;
 
   return (
     <section className="mx-auto max-w-6xl animate-fade-in">
@@ -41,7 +40,7 @@ const dynamicAboutImage = profile?.about_image
             <span
               className="absolute left-3 top-3 w-px bg-linear-to-b from-white via-gray-300 to-white shadow-[0_0_18px_rgba(255,255,255,0.55)] transition-all duration-300 ease-out"
               style={{
-                height: `calc((100% - 1.5rem) * ${scrollProgress})`,
+                height: "calc((100% - 1.5rem) * var(--scroll-progress, 0))",
               }}
             />
 
@@ -49,7 +48,6 @@ const dynamicAboutImage = profile?.about_image
               <ExperienceItem
                 key={experience.id ?? experience.title ?? experience.company}
                 experience={experience}
-                isActive={scrollProgress > experience.activeAt}
               />
             ))}
           </div>
@@ -61,7 +59,7 @@ const dynamicAboutImage = profile?.about_image
   );
 }
 
-const ExperienceItem = memo(function ExperienceItem({ experience, isActive }) {
+const ExperienceItem = memo(function ExperienceItem({ experience }) {
   const formatDate = (dateString) => {
     if (!dateString) return "Sekarang";
 
@@ -72,16 +70,18 @@ const ExperienceItem = memo(function ExperienceItem({ experience, isActive }) {
   };
 
   return (
-    <div className="relative">
+    <div
+      className="group/experience relative"
+      data-active="false"
+      data-experience-active-at={experience.activeAt}
+    >
       <span
         className={`
           absolute -left-8 top-2 h-6 w-6 rounded-full border-2 bg-black
           transition-all duration-500
-          ${
-            isActive
-              ? "border-white shadow-[0_0_24px_rgba(255,255,255,0.65)]"
-              : "border-white/35 shadow-none"
-          }
+          border-white/35 shadow-none
+          group-data-[active=true]/experience:border-white
+          group-data-[active=true]/experience:shadow-[0_0_24px_rgba(255,255,255,0.65)]
         `}
       />
 
@@ -89,11 +89,9 @@ const ExperienceItem = memo(function ExperienceItem({ experience, isActive }) {
         className={`
           rounded-2xl border bg-white/5 p-5 backdrop-blur-md
           transition-all duration-500
-          ${
-            isActive
-              ? "border-white/40 shadow-[0_0_28px_rgba(255,255,255,0.14)]"
-              : "border-white/10"
-          }
+          border-white/10
+          group-data-[active=true]/experience:border-white/40
+          group-data-[active=true]/experience:shadow-[0_0_28px_rgba(255,255,255,0.14)]
         `}
       >
         <h4 className="text-lg font-semibold text-white">

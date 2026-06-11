@@ -1,4 +1,5 @@
 
+import { memo, useState } from "react";
 import MainLayout from "../../../components/layout/MainLayout";
 import SEO from "../../../components/common/SEO";
 import HomeSection from "../components/HomeSection/HomeSection";
@@ -17,16 +18,6 @@ const navItems = [
 ];
 
 function PortfolioPage() {
-const {
-    activeSection,
-    isLoaded,
-    showBottomNav,
-    isNavbarOnHero,
-    selectedProject,
-    setSelectedProject,
-    scrollToSection
-  } = usePortfolioPage(navItems);
-
   return (
     <>
       <SEO
@@ -35,48 +26,75 @@ const {
         path="/"
       />
 
-      <MainLayout
-        navItems={navItems}
-        activeSection={activeSection}
-        scrollToSection={scrollToSection}
-        isLoaded={isLoaded}
-        isNavbarOnHero={isNavbarOnHero}
-        showBottomNav={showBottomNav}
-        selectedProject={selectedProject}
-      >
-        <section id="home" className="flex min-h-screen flex-col">
-          <HomeSection
-            isLoaded={isLoaded}
-            setActiveSection={scrollToSection}
-          />
-        </section>
-
-        <section
-          id="about"
-          className="flex min-h-screen items-center justify-center px-4 py-5"
-        >
-          <AboutSection />
-        </section>
-
-        <section
-          id="lab"
-          className="flex min-h-screen items-center justify-center px-4 py-5"
-        >
-          <LabSection
-            selectedProject={selectedProject}
-            setSelectedProject={setSelectedProject}
-          />
-        </section>
-
-        <section
-          id="contact"
-          className="flex h-auto items-center justify-center px-4 py-25"
-        >
-          <ContactSection />
-        </section>
-      </MainLayout>
+      <PortfolioShell />
     </>
   );
 }
+
+function PortfolioShell() {
+  const {
+    activeSection,
+    isLoaded,
+    isNavbarOnHero,
+    scrollToSection,
+  } = usePortfolioPage(navItems);
+
+  return (
+    <MainLayout
+      navItems={navItems}
+      activeSection={activeSection}
+      scrollToSection={scrollToSection}
+      isLoaded={isLoaded}
+      isNavbarOnHero={isNavbarOnHero}
+    >
+      <PortfolioSections
+        isLoaded={isLoaded}
+        scrollToSection={scrollToSection}
+      />
+    </MainLayout>
+  );
+}
+
+const PortfolioSections = memo(function PortfolioSections({
+  isLoaded,
+  scrollToSection,
+}) {
+  const [selectedProject, setSelectedProject] = useState(null);
+
+  return (
+    <>
+      <section id="home" className="flex min-h-screen flex-col">
+        <HomeSection
+          isLoaded={isLoaded}
+          setActiveSection={scrollToSection}
+        />
+      </section>
+
+      <section
+        id="about"
+        className="flex min-h-screen items-center justify-center px-4 py-5"
+      >
+        <AboutSection />
+      </section>
+
+      <section
+        id="lab"
+        className="flex min-h-screen items-center justify-center px-4 py-5"
+      >
+        <LabSection
+          selectedProject={selectedProject}
+          setSelectedProject={setSelectedProject}
+        />
+      </section>
+
+      <section
+        id="contact"
+        className="flex h-auto items-center justify-center px-4 py-25"
+      >
+        <ContactSection />
+      </section>
+    </>
+  );
+});
 
 export default PortfolioPage;

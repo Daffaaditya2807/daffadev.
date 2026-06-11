@@ -4,12 +4,27 @@ import { supabase } from "@/core/supabase";
 export function useAboutSection() {
   const experienceRef = useRef(null);
 
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [profile, setProfile] = useState(null);
   const [experiences, setExperiences] = useState([]);
 
   const scrollProgressRef = useRef(0);
   const tickingRef = useRef(false);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      if (!experienceRef.current) return;
+
+      experienceRef.current
+        .querySelectorAll("[data-experience-active-at]")
+        .forEach((item) => {
+          item.dataset.active =
+            scrollProgressRef.current >
+            Number(item.dataset.experienceActiveAt);
+        });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [experiences]);
 
   useEffect(() => {
     let isMounted = true;
@@ -79,8 +94,18 @@ export function useAboutSection() {
 
       if (progressDiff > 0.015 || nextProgress === 0 || nextProgress === 1) {
         scrollProgressRef.current = nextProgress;
-        setScrollProgress(nextProgress);
+        experienceRef.current.style.setProperty(
+          "--scroll-progress",
+          nextProgress
+        );
       }
+
+      experienceRef.current
+        .querySelectorAll("[data-experience-active-at]")
+        .forEach((item) => {
+          item.dataset.active =
+            nextProgress > Number(item.dataset.experienceActiveAt);
+        });
     };
 
     const handleScroll = () => {
@@ -109,6 +134,5 @@ export function useAboutSection() {
     experiences,
     profile,
     experienceRef,
-    scrollProgress,
   };
 }

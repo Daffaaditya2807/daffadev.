@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 function SpotifyWidget() {
   const [trackData, setTrackData] = useState({
@@ -178,4 +178,4 @@ return (
 );
 }
 
-export default SpotifyWidget;
+export default memo(SpotifyWidget);

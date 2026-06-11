@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import emailjs from "emailjs-com";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -99,4 +99,4 @@ function ContactSection() {
   );
 }
 
-export default ContactSection;
+export default memo(ContactSection);
