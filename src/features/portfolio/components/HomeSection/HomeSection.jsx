@@ -1,37 +1,38 @@
+import { memo } from "react";
 import { useHomeSection } from "../../hooks/useHomeSection";
 import { FaGithub, FaLinkedinIn, FaInstagram } from "react-icons/fa";
 import HeroContent from "./HeroContent";
 import IntroCard from "./IntroCard";
 import TechStackSlider from "./TechStackSlider";
+
 const socialLinks = [
   {
-    Icon: FaGithub, // 👈 Logo GitHub Resmi
+    Icon: FaGithub,
     href: "https://github.com/Daffaaditya2807",
     label: "GitHub",
   },
   {
-    Icon: FaLinkedinIn, // 👈 Logo LinkedIn Resmi
+    Icon: FaLinkedinIn,
     href: "https://www.linkedin.com/in/daffaadityarejasaruswanto/",
     label: "LinkedIn",
   },
   {
-    Icon: FaInstagram, // 👈 Logo Instagram Resmi
+    Icon: FaInstagram,
     href: "https://www.instagram.com/daafaditya/",
     label: "Instagram",
-  }
+  },
 ];
+
 function HomeSection({ isLoaded = false, setActiveSection }) {
   const {
     profile,
     techStacks,
-    typingText,
-    handleDownloadCV,
     handleDownloadPortfolio,
     handleContactClick,
   } = useHomeSection({ setActiveSection });
 
   return (
-  <section className="relative flex items-center justify-center overflow-hidden py-2">
+    <section className="relative flex items-center justify-center overflow-hidden py-2">
       <div
         className={`
           z-10 mx-auto w-full max-w-7xl px-4 transition-all duration-1000
@@ -42,21 +43,21 @@ function HomeSection({ isLoaded = false, setActiveSection }) {
       >
         <HeroContent
           profile={profile}
-          onDownloadCV={handleDownloadCV}
           onDownloadPortfolio={handleDownloadPortfolio}
           onContactClick={handleContactClick}
         />
 
-        <IntroCard typingText={typingText} profile={profile} />
+        <IntroCard profile={profile} />
 
         <TechStackSlider techStacks={techStacks} />
+
         <SocialLinks isLoaded={isLoaded} />
       </div>
     </section>
   );
 }
 
-function SocialLinks({ isLoaded }) {
+const SocialLinks = memo(function SocialLinks({ isLoaded }) {
   return (
     <div
       className={`
@@ -86,6 +87,6 @@ function SocialLinks({ isLoaded }) {
       </div>
     </div>
   );
-}
+});
 
-export default HomeSection;
+export default memo(HomeSection);

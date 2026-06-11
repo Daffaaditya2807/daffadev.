@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useAboutSection } from "../hooks/useAboutSection";
 import memojiImage from "../../../assets/images/userpng.png";
 import { supabase } from "@/core/supabase";
@@ -5,9 +6,7 @@ import { supabase } from "@/core/supabase";
 const STORAGE_BUCKET = "portfolio-assets";
 
 const getPublicImageUrl = (path) => {
-  if (!path) {
-    return "";
-  }
+  if (!path) return "";
 
   if (path.startsWith("http")) {
     return path;
@@ -17,8 +16,12 @@ const getPublicImageUrl = (path) => {
 };
 
 function AboutSection() {
-  const { experienceRef, scrollProgress , profile , experiencess } = useAboutSection();
-  const dynamicAboutImage = profile?.about_image ? getPublicImageUrl(profile.about_image) : memojiImage;
+  const { experienceRef, scrollProgress, profile, experiences } =
+    useAboutSection();
+
+const dynamicAboutImage = profile?.about_image
+  ? getPublicImageUrl(profile.about_image)
+  : memojiImage;
 
   return (
     <section className="mx-auto max-w-6xl animate-fade-in">
@@ -42,9 +45,9 @@ function AboutSection() {
               }}
             />
 
-            {experiencess.map((experience) => (
+            {experiences.map((experience) => (
               <ExperienceItem
-                key={experience.title}
+                key={experience.id ?? experience.title ?? experience.company}
                 experience={experience}
                 isActive={scrollProgress > experience.activeAt}
               />
@@ -58,10 +61,10 @@ function AboutSection() {
   );
 }
 
-function ExperienceItem({ experience, isActive }) {
-  // Fungsi untuk memformat tanggal (contoh: "Jan 2023")
+const ExperienceItem = memo(function ExperienceItem({ experience, isActive }) {
   const formatDate = (dateString) => {
-    if (!dateString) return "Sekarang"; // Jika null, berarti pekerjaan masih berlangsung
+    if (!dateString) return "Sekarang";
+
     return new Date(dateString).toLocaleDateString("id-ID", {
       month: "short",
       year: "numeric",
@@ -97,13 +100,14 @@ function ExperienceItem({ experience, isActive }) {
           {experience.company}
         </h4>
 
-        {/* Baris Posisi dan Tanggal */}
         <div className="mt-1 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm font-medium text-gray-400">
             {experience.position}
           </p>
-          <p className="mt-1 text-xs text-gray-500 sm:mt-0 font-mono">
-            {formatDate(experience.date_start)} — {formatDate(experience.date_end)}
+
+          <p className="mt-1 font-mono text-xs text-gray-500 sm:mt-0">
+            {formatDate(experience.date_start)} —{" "}
+            {formatDate(experience.date_end)}
           </p>
         </div>
 
@@ -113,39 +117,33 @@ function ExperienceItem({ experience, isActive }) {
       </div>
     </div>
   );
-}
+});
 
-function ProfileImage({ imageSrc }) {
+const ProfileImage = memo(function ProfileImage({ imageSrc }) {
   return (
     <div className="flex justify-center">
       <div className="group relative">
-        
-        {/* Kontainer utama: Efek hover scale tetap ada, tapi lebih clean */}
         <div className="relative h-100 w-80 overflow-hidden rounded-3xl transition-all duration-500 hover:scale-105">
           <div className="relative z-10 flex h-full w-full items-center justify-center">
-            
-            {/* Gambar: Ditambahkan rounded-3xl dan object-cover agar sudut melengkung sempurna */}
             <img
               src={imageSrc}
               alt="Ilustrasi profil"
+              loading="lazy"
+              decoding="async"
               className="h-full w-full rounded-3xl object-cover drop-shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
             />
           </div>
         </div>
 
-        {/* Efek partikel titik-titik di luar gambar (saya biarkan karena ini mempercantik hover) */}
         <div className="pointer-events-none absolute -inset-4 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
           <div className="absolute left-4 top-4 h-2 w-2 animate-pulse rounded-full bg-gray-400" />
           <div className="absolute right-8 top-12 h-1 w-1 animate-ping rounded-full bg-gray-400" />
           <div className="absolute bottom-8 left-12 h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
           <div className="absolute bottom-4 right-4 h-1 w-1 animate-ping rounded-full bg-gray-300" />
         </div>
-        
       </div>
     </div>
   );
-}
+});
 
-export default AboutSection;
-
-
+export default memo(AboutSection);

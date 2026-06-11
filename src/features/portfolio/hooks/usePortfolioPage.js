@@ -1,68 +1,97 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export function usePortfolioPage( navItems ) {
+export function usePortfolioPage(navItems) {
   const [activeSection, setActiveSection] = useState("home");
   const [isLoaded, setIsLoaded] = useState(false);
   const [showBottomNav, setShowBottomNav] = useState(false);
   const [isNavbarOnHero, setIsNavbarOnHero] = useState(true);
   const [selectedProject, setSelectedProject] = useState(null);
-  const loadedRef = useRef(false);
 
-  if (!loadedRef.current) {
-    loadedRef.current = true;
-    requestAnimationFrame(() => setIsLoaded(true));
-  }
+  const activeSectionRef = useRef("home");
+  const isNavbarOnHeroRef = useRef(true);
+  const showBottomNavRef = useRef(false);
+  const tickingRef = useRef(false);
 
   useEffect(() => {
-    // 1. Pindahkan fungsi ke dalam useEffect
+    const frame = requestAnimationFrame(() => {
+      setIsLoaded(true);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
     const updateActiveSection = () => {
       const scrollPosition = window.scrollY + window.innerHeight / 2;
 
-      navItems.forEach((item) => {
+      let currentSection = activeSectionRef.current;
+
+      for (const item of navItems) {
         const element = document.getElementById(item.id);
-        if (!element) return;
-        
+        if (!element) continue;
+
         const offsetTop = element.offsetTop;
         const offsetBottom = offsetTop + element.offsetHeight;
 
         if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
-          setActiveSection(item.id);
+          currentSection = item.id;
+          break;
         }
-      });
+      }
+
+      if (currentSection !== activeSectionRef.current) {
+        activeSectionRef.current = currentSection;
+        setActiveSection(currentSection);
+      }
     };
 
     const updateNavigationVisibility = () => {
       const homeHero = document.getElementById("home-hero");
       const navbarHeight = 80;
 
-      if (!homeHero) {
-        setIsNavbarOnHero(false);
-        setShowBottomNav(true);
-        return;
+      let nextIsNavbarOnHero = false;
+      let nextShowBottomNav = true;
+
+      if (homeHero) {
+        const heroBottom =
+          homeHero.getBoundingClientRect().bottom + window.scrollY;
+
+        nextIsNavbarOnHero = window.scrollY < heroBottom - navbarHeight;
+        nextShowBottomNav = !nextIsNavbarOnHero;
       }
 
-      const heroBottom = homeHero.getBoundingClientRect().bottom + window.scrollY;
-      const isStillOnHero = window.scrollY < heroBottom - navbarHeight;
+      if (nextIsNavbarOnHero !== isNavbarOnHeroRef.current) {
+        isNavbarOnHeroRef.current = nextIsNavbarOnHero;
+        setIsNavbarOnHero(nextIsNavbarOnHero);
+      }
 
-      setIsNavbarOnHero(isStillOnHero);
-      setShowBottomNav(!isStillOnHero);
+      if (nextShowBottomNav !== showBottomNavRef.current) {
+        showBottomNavRef.current = nextShowBottomNav;
+        setShowBottomNav(nextShowBottomNav);
+      }
     };
 
-    // 2. Sekarang handleScroll bisa langsung memanggilnya tanpa warning
     const handleScroll = () => {
-      updateActiveSection();
-      updateNavigationVisibility();
+      if (tickingRef.current) return;
+
+      tickingRef.current = true;
+
+      requestAnimationFrame(() => {
+        updateActiveSection();
+        updateNavigationVisibility();
+        tickingRef.current = false;
+      });
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [navItems]); // Hanya navItems yang perlu masuk dependency array
+  }, [navItems]);
 
-  const scrollToSection = (sectionId) => {
+  const scrollToSection = useCallback((sectionId) => {
     const element = document.getElementById(sectionId);
 
     if (element) {
@@ -72,8 +101,11 @@ export function usePortfolioPage( navItems ) {
       });
     }
 
-    setActiveSection(sectionId);
-  };
+    if (sectionId !== activeSectionRef.current) {
+      activeSectionRef.current = sectionId;
+      setActiveSection(sectionId);
+    }
+  }, []);
 
   return {
     activeSection,
@@ -82,6 +114,6 @@ export function usePortfolioPage( navItems ) {
     isNavbarOnHero,
     selectedProject,
     setSelectedProject,
-    scrollToSection
+    scrollToSection,
   };
 }

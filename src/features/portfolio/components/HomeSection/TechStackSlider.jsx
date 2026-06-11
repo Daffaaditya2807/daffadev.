@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -8,6 +9,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 function TechStackSlider({ techStacks = defaultTechStacks }) {
+  const swiperModules = useMemo(() => [Navigation, Autoplay], []);
+
   return (
     <div className="mx-auto mt-8 max-w-5xl">
       <div className="mb-4 flex items-center justify-between gap-4 px-1">
@@ -33,16 +36,17 @@ function TechStackSlider({ techStacks = defaultTechStacks }) {
       </div>
 
       <Swiper
-        modules={[Navigation, Autoplay]}
+        modules={swiperModules}
         navigation={{
           prevEl: ".tech-stack-prev",
           nextEl: ".tech-stack-next",
         }}
         autoplay={{
-          delay: 2200,
+          delay: 2600,
           disableOnInteraction: false,
+          pauseOnMouseEnter: true,
         }}
-        loop
+        loop={techStacks.length > 5}
         spaceBetween={14}
         slidesPerView={2}
         breakpoints={{
@@ -65,4 +69,4 @@ function TechStackSlider({ techStacks = defaultTechStacks }) {
   );
 }
 
-export default TechStackSlider;
+export default memo(TechStackSlider);

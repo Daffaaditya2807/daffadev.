@@ -6,7 +6,7 @@ import {
   Globe,
 } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
-import { useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { useLabSection } from "../hooks/useLabSection";
 
 
@@ -14,6 +14,7 @@ const PROJECTS_PER_PAGE = 6;
 
 function LabSection({ selectedProject, setSelectedProject }) {
   const [currentPage, setCurrentPage] = useState(1);
+
   const {
     activeFilter,
     categories,
@@ -28,31 +29,41 @@ function LabSection({ selectedProject, setSelectedProject }) {
     setSelectedProject,
   });
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredProjects.length / PROJECTS_PER_PAGE)
-  );
+  const totalPages = useMemo(() => {
+    return Math.max(
+      1,
+      Math.ceil(filteredProjects.length / PROJECTS_PER_PAGE)
+    );
+  }, [filteredProjects.length]);
 
   const paginatedProjects = useMemo(() => {
     const startIndex = (currentPage - 1) * PROJECTS_PER_PAGE;
-    return filteredProjects.slice(startIndex, startIndex + PROJECTS_PER_PAGE);
+
+    return filteredProjects.slice(
+      startIndex,
+      startIndex + PROJECTS_PER_PAGE
+    );
   }, [currentPage, filteredProjects]);
 
-  const handlePreviousPage = () => {
+  const handlePreviousPage = useCallback(() => {
     setCurrentPage((page) => Math.max(1, page - 1));
-  };
+  }, []);
 
-  const handleNextPage = () => {
+  const handleNextPage = useCallback(() => {
     setCurrentPage((page) => Math.min(totalPages, page + 1));
-  };
+  }, [totalPages]);
 
-  const handleFilterChange = (filterId) => {
-    setCurrentPage(1);
-    handleChangeFilter(filterId);
-  };
+  const handleFilterChange = useCallback(
+    (filterId) => {
+      setCurrentPage(1);
+      handleChangeFilter(filterId);
+    },
+    [handleChangeFilter]
+  );
+
 
  return (
-    <section className="mx-auto max-w-7xl px-4  sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <SectionHeader />
 
       <CategoryFilter
@@ -62,20 +73,14 @@ function LabSection({ selectedProject, setSelectedProject }) {
       />
 
       {isLoading ? (
-        <div className="rounded-3xl border border-white/10 bg-white/5 px-6 py-8 text-center text-gray-300">
-          Memuat portfolio...
-        </div>
+        <StatusBox text="Memuat portfolio..." />
       ) : errorMessage ? (
-        <div className="rounded-3xl border border-white/10 bg-white/5 px-6 py-8 text-center text-gray-300">
-          {errorMessage}
-        </div>
+        <StatusBox text={errorMessage} />
       ) : filteredProjects.length === 0 ? (
-        <div className="rounded-3xl border border-white/10 bg-white/5 px-6 py-8 text-center text-gray-300">
-          Belum ada project yang ditampilkan.
-        </div>
+        <StatusBox text="Belum ada project yang ditampilkan." />
       ) : (
         <>
-          <div className="grid grid-cols-1 p-5 sm:p-2 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-8 p-5 sm:p-2 md:grid-cols-2 lg:grid-cols-3">
             {paginatedProjects.map((project) => (
               <ProjectCard
                 key={project.id}
@@ -97,16 +102,22 @@ function LabSection({ selectedProject, setSelectedProject }) {
       )}
 
       {selectedProject && (
-        <ProjectModal
-          project={selectedProject}
-          onClose={handleCloseProject}
-        />
+        <ProjectModal project={selectedProject} onClose={handleCloseProject} />
       )}
     </section>
   );
 }
 
-function ProjectPagination({
+const StatusBox = memo(function StatusBox({ text }) {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-white/5 px-6 py-8 text-center text-gray-300">
+      {text}
+    </div>
+  );
+});
+
+
+const ProjectPagination = memo(function ProjectPagination({
   currentPage,
   totalPages,
   onPreviousPage,
@@ -139,9 +150,9 @@ function ProjectPagination({
       </button>
     </div>
   );
-}
+});
 
-function SectionHeader() {
+const SectionHeader = memo(function SectionHeader() {
   return (
     <div className="mb-8 text-center">
       <h2 className="mb-6 text-4xl font-bold text-white lg:text-5xl">
@@ -154,23 +165,22 @@ function SectionHeader() {
       </p>
     </div>
   );
-}
+});
 
-function CategoryFilter({ categories, activeFilter, onChangeFilter }) {
+const CategoryFilter = memo(function CategoryFilter({
+  categories,
+  activeFilter,
+  onChangeFilter,
+}) {
   return (
-   
-    <div className="mb-12 w-screen relative left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 md:w-full">
-      <div 
+    <div className="relative left-1/2 mb-12 w-screen -translate-x-1/2 md:left-0 md:w-full md:translate-x-0">
+      <div
         className="
-          flex flex-nowrap items-center gap-3 
-          overflow-x-auto px-5 pb-4
+          scrollbar-none flex touch-pan-x flex-nowrap items-center gap-3
+          overflow-x-auto overscroll-x-contain px-5 pb-4
+          [-webkit-overflow-scrolling:touch] [::-webkit-scrollbar]:hidden
           md:flex-wrap md:justify-center md:px-0 md:pb-0
-          scrollbar-none [::-webkit-scrollbar]:hidden
-          touch-pan-x overscroll-x-contain
         "
-        style={{
-          WebkitOverflowScrolling: "touch"
-        }}
       >
         {categories.map((category) => {
           const Icon = category.icon;
@@ -182,28 +192,28 @@ function CategoryFilter({ categories, activeFilter, onChangeFilter }) {
               type="button"
               onClick={() => onChangeFilter(category.id)}
               className={`
-                flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm
+                flex shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-sm
                 transition-all duration-200 active:scale-95
-                shrink-0 
                 ${
                   isActive
-                    ? "border-white bg-white text-black font-semibold shadow-lg shadow-white/10"
+                    ? "border-white bg-white font-semibold text-black shadow-lg shadow-white/10"
                     : "border-white/10 bg-[#161616] text-gray-400 hover:border-white/20 hover:text-white"
                 }
               `}
             >
               {Icon && <Icon className="h-4 w-4" />}
-              <span className="whitespace-nowrap select-none">{category.label}</span>
+              <span className="select-none whitespace-nowrap">
+                {category.label}
+              </span>
             </button>
           );
         })}
-        
-        {/* Spacer kanan ekstra agar tombol paling ujung tidak terpotong saat di-swipe mentok */}
+
         <div className="w-5 shrink-0 md:hidden" />
       </div>
     </div>
   );
-}
+});
 
 function ProjectCard({ project, onSelectProject }) {
   return (
@@ -517,4 +527,4 @@ function ProjectModalLinks({ links }) {
   );
 }
 
-export default LabSection;
+export default memo(LabSection);

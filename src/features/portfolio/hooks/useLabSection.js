@@ -1,6 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/core/supabase";
-import { fallbackCategories, getLabAssetUrl, iconMap } from "../data/labSectionData";
+import {
+  fallbackCategories,
+  getLabAssetUrl,
+  iconMap,
+} from "../data/labSectionData";
 
 const mapProject = (project) => ({
   id: project.id,
@@ -10,7 +14,10 @@ const mapProject = (project) => ({
   description: project.description,
   longDescription: project.long_description || project.description,
   image: getLabAssetUrl(project.image_path),
-  screenshots: (project.screenshots?.length ? project.screenshots : [project.image_path])
+  screenshots: (project.screenshots?.length
+    ? project.screenshots
+    : [project.image_path]
+  )
     .filter(Boolean)
     .map(getLabAssetUrl),
   tech: project.tech_stack || [],
@@ -39,12 +46,16 @@ export function useLabSection({ selectedProject, setSelectedProject }) {
     let isMounted = true;
 
     const fetchLabData = async () => {
+      setIsLoading(true);
+      setErrorMessage("");
+
       const [categoryResult, projectResult] = await Promise.all([
         supabase
           .from("lab_categories")
           .select("id,label,icon_key,kind,sort_order")
           .eq("is_active", true)
           .order("sort_order", { ascending: true }),
+
         supabase
           .from("lab_projects")
           .select("*")
@@ -53,9 +64,7 @@ export function useLabSection({ selectedProject, setSelectedProject }) {
           .order("created_at", { ascending: false }),
       ]);
 
-      if (!isMounted) {
-        return;
-      }
+      if (!isMounted) return;
 
       if (categoryResult.error || projectResult.error) {
         setErrorMessage("Gagal mengambil data portfolio.");
@@ -64,9 +73,17 @@ export function useLabSection({ selectedProject, setSelectedProject }) {
       }
 
       const mappedCategories = (categoryResult.data || []).map(mapCategory);
-      const hasAllCategory = mappedCategories.some((category) => category.id === "all");
 
-      setCategories(hasAllCategory ? mappedCategories : [...fallbackCategories, ...mappedCategories]);
+      const hasAllCategory = mappedCategories.some(
+        (category) => category.id === "all"
+      );
+
+      setCategories(
+        hasAllCategory
+          ? mappedCategories
+          : [...fallbackCategories, ...mappedCategories]
+      );
+
       setProjects((projectResult.data || []).map(mapProject));
       setIsLoading(false);
     };
@@ -82,12 +99,20 @@ export function useLabSection({ selectedProject, setSelectedProject }) {
     const htmlElement = document.documentElement;
     const bodyElement = document.body;
 
-    htmlElement.style.overflow = selectedProject ? "hidden" : "auto";
-    bodyElement.style.overflow = selectedProject ? "hidden" : "auto";
+    const previousHtmlOverflow = htmlElement.style.overflow;
+    const previousBodyOverflow = bodyElement.style.overflow;
+
+    if (selectedProject) {
+      htmlElement.style.overflow = "hidden";
+      bodyElement.style.overflow = "hidden";
+    } else {
+      htmlElement.style.overflow = previousHtmlOverflow || "";
+      bodyElement.style.overflow = previousBodyOverflow || "";
+    }
 
     return () => {
-      htmlElement.style.overflow = "auto";
-      bodyElement.style.overflow = "auto";
+      htmlElement.style.overflow = previousHtmlOverflow;
+      bodyElement.style.overflow = previousBodyOverflow;
     };
   }, [selectedProject]);
 
@@ -102,17 +127,20 @@ export function useLabSection({ selectedProject, setSelectedProject }) {
     );
   }, [activeFilter, projects]);
 
-  const handleChangeFilter = (filterId) => {
+  const handleChangeFilter = useCallback((filterId) => {
     setActiveFilter(filterId);
-  };
+  }, []);
 
-  const handleSelectProject = (project) => {
-    setSelectedProject(project);
-  };
+  const handleSelectProject = useCallback(
+    (project) => {
+      setSelectedProject(project);
+    },
+    [setSelectedProject]
+  );
 
-  const handleCloseProject = () => {
+  const handleCloseProject = useCallback(() => {
     setSelectedProject(null);
-  };
+  }, [setSelectedProject]);
 
   return {
     activeFilter,

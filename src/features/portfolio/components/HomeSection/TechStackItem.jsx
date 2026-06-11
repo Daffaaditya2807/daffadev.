@@ -1,9 +1,7 @@
+import { memo } from "react";
+
 function TechStackItem({ tech }) {
   const { name, Icon, color } = tech;
-
-  const setIconColor = (event, value) => {
-    event.currentTarget.style.color = value;
-  };
 
   return (
     <div
@@ -11,16 +9,11 @@ function TechStackItem({ tech }) {
       title={name}
       aria-label={name}
       tabIndex={0}
+      style={{ "--tech-color": color }}
     >
-      <Icon
-        className="h-10 w-10 text-gray-400 grayscale transition-all duration-300 group-hover:scale-110 group-hover:grayscale-0"
-        onMouseEnter={(event) => setIconColor(event, color)}
-        onMouseLeave={(event) => setIconColor(event, "")}
-        onFocus={(event) => setIconColor(event, color)}
-        onBlur={(event) => setIconColor(event, "")}
-      />
+      <Icon className="h-10 w-10 text-gray-400 grayscale transition-all duration-300 group-hover:scale-110 group-hover:text-(--tech-color) group-hover:grayscale-0 group-focus:text-(--tech-color) group-focus:grayscale-0" />
     </div>
   );
 }
 
-export default TechStackItem;
+export default memo(TechStackItem);

@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import { ArrowUpRight } from "lucide-react";
 import heroImage from "../../../../assets/images/daff-rgb.png";
 import { supabase } from "@/core/supabase";
@@ -5,66 +6,67 @@ import { supabase } from "@/core/supabase";
 const STORAGE_BUCKET = "portfolio-assets";
 
 const getPublicImageUrl = (path) => {
-  if (!path) {
-    return "";
-  }
+  if (!path) return "";
 
   if (path.startsWith("http")) {
     return path;
   }
 
-  return supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data
-    .publicUrl;
+  return supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
 };
 
 function HeroContent({ profile, onDownloadPortfolio, onContactClick }) {
   const heroName = profile?.name?.split(" ")[0] || "Daffa";
   const heroAlt = profile?.name || "Daffa Aditya Rejasa Ruswanto";
+
   const heroTextOne =
     profile?.text_hero_1 ||
     "Software engineer yang fokus membangun pengalaman mobile dan web yang rapi, responsif, dan mudah digunakan.";
+
   const heroTextTwo =
     profile?.text_hero_2 ||
     "Menggabungkan mobile development, frontend, dan backend untuk membuat produk digital yang berjalan stabil dan terlihat profesional.";
 
-  const dynamicHeroImage =
-    getPublicImageUrl(profile?.hero_image_rgb) ||
-    getPublicImageUrl(profile?.hero_image_bw) ||
-    heroImage;
+  const dynamicHeroImage = useMemo(() => {
+    return (
+      getPublicImageUrl(profile?.hero_image_rgb) ||
+      getPublicImageUrl(profile?.hero_image_bw) ||
+      heroImage
+    );
+  }, [profile?.hero_image_rgb, profile?.hero_image_bw]);
 
   return (
     <div
       id="home-hero"
       className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden bg-[#0a0a0a]"
     >
-     <div className="absolute inset-0 z-0 hidden lg:block bg-[radial-gradient(circle_at_35%_45%,rgba(255,255,255,0.18),transparent_28%),radial-gradient(circle_at_72%_35%,rgba(255,255,255,0.13),transparent_22%),linear-gradient(135deg,#050505_0%,#111111_45%,#000000_100%)]" />
-      <div className="absolute -left-20 top-16 h-80 w-80 rounded-full border border-white/10" />
-      <div className="absolute left-1/3 top-14 h-120 w-120 rounded-full border-[5rem] border-white/4" />
+      <div className="absolute inset-0 z-0 hidden bg-[radial-gradient(circle_at_35%_45%,rgba(255,255,255,0.18),transparent_28%),radial-gradient(circle_at_72%_35%,rgba(255,255,255,0.13),transparent_22%),linear-gradient(135deg,#050505_0%,#111111_45%,#000000_100%)] lg:block" />
 
-      {/* Mobile Layout */}
+      <div className="pointer-events-none absolute -left-20 top-16 h-80 w-80 rounded-full border border-white/10" />
+      <div className="pointer-events-none absolute left-1/3 top-14 h-120 w-120 rounded-full border-[5rem] border-white/4" />
+
       <div className="relative z-10 flex h-auto flex-col px-5 pt-24 lg:hidden">
-    <h1 className="text-center text-[5.5rem] font-black uppercase leading-none tracking-normal text-white sm:text-[7rem] md:text-[9rem] font-display">
-  {heroName}
-</h1>
+        <h1 className="font-display text-center text-[5.5rem] font-black uppercase leading-none tracking-normal text-white sm:text-[7rem] md:text-[9rem]">
+          {heroName}
+        </h1>
 
-        {/* Wrapper gambar + gradasi */}
-        <div className="relative z-20 -mt-6 flex justify-center sm:-mt-8  overflow-hidden">
+        <div className="relative z-20 -mt-6 flex justify-center overflow-hidden sm:-mt-8">
           <img
             src={dynamicHeroImage}
             alt={heroAlt}
             loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="h-105 max-w-none object-contain opacity-100 grayscale contrast-110 transition-all duration-500 hover:grayscale-0 hover:contrast-100 sm:h-130"
           />
 
-          {/* Efek Gradasi Hitam di bawah gambar (Meniru logic Desktop) */}
-          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent pointer-events-none" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
         </div>
 
-        {/* Container Teks dan Tombol */}
         <div className="relative z-30 -mt-2 grid gap-6 pb-12 text-center sm:mx-auto sm:max-w-xl">
           <div>
             <p className="text-lg leading-relaxed text-white sm:text-base">
-              {heroTextOne} 
+              {heroTextOne}
             </p>
           </div>
 
@@ -87,21 +89,21 @@ function HeroContent({ profile, onDownloadPortfolio, onContactClick }) {
         </div>
       </div>
 
-      {/* Desktop Layout */}
       <div className="relative z-10 hidden min-h-170 lg:block">
-        <h1 className="absolute left-4 right-4 top-10 z-10 text-center text-[11rem] font-black uppercase leading-none tracking-normal text-white xl:text-[13rem] font-display">
+        <h1 className="font-display absolute left-4 right-4 top-10 z-10 text-center text-[11rem] font-black uppercase leading-none tracking-normal text-white xl:text-[13rem]">
           {heroName}
         </h1>
 
         <img
           src={dynamicHeroImage}
           loading="eager"
+          fetchPriority="high"
+          decoding="async"
           alt={heroAlt}
-          // 👇 Perubahan ada di sini: penambahan class transisi dan hover
           className="absolute bottom-0 left-1/2 z-20 h-[88%] max-w-none -translate-x-1/2 object-contain opacity-100 grayscale contrast-110 transition-all duration-500 hover:grayscale-0 hover:contrast-100"
         />
 
-        <div className="absolute inset-x-0 bottom-0 z-30 h-1/2 bg-linear-to-t from-[#0a0a0a] via-[#0a0a0a]/35 to-transparent pointer-events-none" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-1/2 bg-linear-to-t from-[#0a0a0a] via-[#0a0a0a]/35 to-transparent" />
 
         <div className="absolute left-10 top-[46%] z-40 max-w-xs text-left">
           <p className="text-base leading-relaxed text-white">{heroTextOne}</p>
@@ -139,4 +141,4 @@ function HeroContent({ profile, onDownloadPortfolio, onContactClick }) {
   );
 }
 
-export default HeroContent;
+export default memo(HeroContent);
