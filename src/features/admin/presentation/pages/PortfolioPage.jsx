@@ -30,7 +30,6 @@ const PortfolioPage = () => {
     isSaving,
     uploadingField,
     handleChange,
-    handleArrayChange,
     handleMainImageUpload,
     handleScreenshotsUpload,
     removeScreenshot,
@@ -259,7 +258,7 @@ const PortfolioPage = () => {
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
           <Dialog.Content
             onInteractOutside={(event) => event.preventDefault()}
-            className="fixed left-1/2 top-1/2 z-50 max-h-[92vh] w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="fixed left-1/2 top-1/2 z-50 max-h-[92vh] w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-white/10 bg-black/90 text-white shadow-2xl shadow-black/60 outline-none scrollbar-none [&::-webkit-scrollbar]:hidden"
           >
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-black/95 px-5 py-4">
               <Dialog.Title className="text-base font-semibold text-white">
@@ -444,18 +443,6 @@ const PortfolioPage = () => {
                     </label>
                   </Button>
                   <p className="text-xs text-white/40">Maksimal 3 MB. Format PNG, JPG, WEBP, atau SVG.</p>
-                  <FormField label="Main Image Path" htmlFor="image_path">
-                    <Input
-                      id="image_path"
-                      name="image_path"
-                      value={form.image_path}
-                      onChange={handleChange}
-                      required
-                      disabled
-                      placeholder="lab-projects/project/image.png"
-                      className="h-10 border-white/10 bg-white/6 text-white placeholder:text-white/30 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:border-white/35 focus-visible:ring-white/10"
-                    />
-                  </FormField>
                 </div>
 
                 <div className="space-y-3 rounded-xl border border-white/10 bg-black/20 p-4">
@@ -485,15 +472,6 @@ const PortfolioPage = () => {
                       </label>
                     </Button>
                   </div>
-
-                  <textarea
-                    id="screenshots"
-                    value={form.screenshots.join('\n')}
-                    onChange={(event) => handleArrayChange('screenshots', event.target.value, '\n')}
-                    rows={4}
-                    placeholder="Satu path gambar per baris"
-                    className="w-full resize-y rounded-lg border border-white/10 bg-white/6 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus-visible:border-white/35 focus-visible:ring-1 focus-visible:ring-white/10"
-                  />
 
                   {form.screenshots.length > 0 && (
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">

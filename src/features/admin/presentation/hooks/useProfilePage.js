@@ -121,7 +121,16 @@ export function useProfilePage() {
         const fieldConfig = imageFields.find((f) => f.id === fieldId)
         if (!fieldConfig) continue
 
-        const filePath = `profile/${fieldConfig.fileName}.${getFileExtension(file)}`
+        // Hapus gambar lama jika ada untuk menghemat storage
+        const oldPath = currentFormState[fieldId]
+        if (oldPath && !oldPath.startsWith('http')) {
+          await supabase.storage.from(STORAGE_BUCKET).remove([oldPath])
+        }
+
+        // Gunakan timestamp agar URL unik dan tidak kena cache browser
+        const timestamp = new Date().getTime()
+        const filePath = `profile/${fieldConfig.fileName}_${timestamp}.${getFileExtension(file)}`
+        
         const { error } = await supabase.storage
           .from(STORAGE_BUCKET)
           .upload(filePath, file, {
@@ -169,7 +178,7 @@ export function useProfilePage() {
     return true
   }
 
-  // Portfolio PDF tetap langsung diupload saat dipilih (atau bisa disamakan jika Anda mau)
+  // Portfolio PDF
   const handlePortfolioUpload = async (event) => {
     const file = event.target.files?.[0]
     event.target.value = ''
@@ -192,7 +201,15 @@ export function useProfilePage() {
     setErrorMessage('')
     setUploadingField('link_porto')
 
-    const filePath = 'documents/portfolio.pdf'
+    // Hapus file portfolio lama jika ada untuk menghemat storage
+    if (form.link_porto && !form.link_porto.startsWith('http')) {
+      await supabase.storage.from(STORAGE_BUCKET).remove([form.link_porto])
+    }
+
+    // Gunakan timestamp agar URL unik dan tidak kena cache browser
+    const timestamp = new Date().getTime()
+    const filePath = `documents/portfolio_${timestamp}.pdf`
+    
     const { error } = await supabase.storage
       .from(STORAGE_BUCKET)
       .upload(filePath, file, {
@@ -211,7 +228,7 @@ export function useProfilePage() {
       ...current,
       link_porto: filePath,
     }))
-    setMessage('File portfolio berhasil diupload.')
+    setMessage('File portfolio berhasil diupload. Jangan lupa klik Simpan Profile.')
     return true
   }
 
