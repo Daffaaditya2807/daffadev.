@@ -1,8 +1,8 @@
-import { Menu, Search, Bell } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Menu } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { ADMIN_MENUS } from '../data/menuData'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import {
   DropdownMenu,
@@ -13,15 +13,38 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import * as Dialog from '@radix-ui/react-dialog'
 import { supabase } from '@/core/supabase'
 
 const Header = () => {
   const navigate = useNavigate()
+  const [user, setUser] = useState(null)
+  const [currentTime, setCurrentTime] = useState(new Date())
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
 
-  const handleLogout = async () => {
+  useEffect(() => {
+    // Fetch logged in user
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
+    })
+
+    // Update time every second
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const handleLogoutClick = (e) => {
+    e.preventDefault()
+    setIsLogoutDialogOpen(true)
+  }
+
+  const confirmLogout = async () => {
     await supabase.auth.signOut()
     navigate('/login', { replace: true })
   }
+
+  const displayName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Admin'
+  const displayRole = user?.user_metadata?.role || 'Superadmin'
 
   return (
     <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/10 bg-white/[0.07] px-4 shadow-lg shadow-black/20 backdrop-blur-2xl md:px-6">
@@ -70,33 +93,29 @@ const Header = () => {
             </nav>
           </SheetContent>
         </Sheet>
-
-        <div className="relative hidden w-64 sm:flex">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-white/45" />
-          <Input
-            type="search"
-            placeholder="Cari menu atau data..."
-            className="border-white/10 bg-white/8 pl-9 text-white placeholder:text-white/40 shadow-inner shadow-white/5 backdrop-blur-xl focus-visible:border-white/35 focus-visible:ring-white/20"
-          />
+        
+        <div className="hidden md:block text-sm text-white/60">
+          {currentTime.toLocaleDateString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}{' '}
+          -{' '}
+          {currentTime.toLocaleTimeString('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
         </div>
       </div>
 
       <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative text-white/70 hover:bg-white/10 hover:text-white"
-        >
-          <Bell size={20} />
-          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.85)]" />
-        </Button>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-white/10">
               <Avatar className="h-9 w-9 border border-white/20 shadow-lg shadow-black/25">
                 <AvatarImage src="https://github.com/shadcn.png" alt="Profile" />
-                <AvatarFallback>DF</AvatarFallback>
+                <AvatarFallback>{displayName.substring(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
@@ -107,20 +126,41 @@ const Header = () => {
           >
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Daffa</p>
-                <p className="text-xs leading-none text-white/50">Superadmin</p>
+                <p className="text-sm font-medium leading-none capitalize">{displayName}</p>
+                <p className="text-xs leading-none text-white/50">{displayRole}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-white/10" />
-            <DropdownMenuItem>Profil Saya</DropdownMenuItem>
-            <DropdownMenuItem>Pengaturan</DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-white/10" />
-            <DropdownMenuItem className="text-white/80" onClick={handleLogout}>
+            <DropdownMenuItem className="text-white/80 cursor-pointer focus:bg-white/10 focus:text-white" onSelect={handleLogoutClick}>
               Keluar
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <Dialog.Root open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-black/90 p-6 text-white shadow-2xl shadow-black/60 outline-none">
+            <div className="flex flex-col gap-4">
+              <div>
+                <Dialog.Title className="text-lg font-semibold text-white">Konfirmasi Keluar</Dialog.Title>
+                <Dialog.Description className="mt-2 text-sm text-white/60">
+                  Apakah Anda yakin ingin keluar dari halaman dashboard admin?
+                </Dialog.Description>
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button type="button" variant="outline" onClick={() => setIsLogoutDialogOpen(false)} className="border-white/10 bg-white/6 text-white hover:bg-white/10 hover:text-white">
+                  Batal
+                </Button>
+                <Button type="button" variant="destructive" onClick={confirmLogout}>
+                  Ya, Keluar
+                </Button>
+              </div>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </header>
   )
 }
