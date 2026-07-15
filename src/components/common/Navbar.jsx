@@ -38,7 +38,7 @@ function Navbar({
           ${isLoaded ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0"}
         `}
       >
-        <span className="text-white font-display">⚡</span>
+        <img src="/daf-dev.png" alt="DaffaDev Logo" className="h-8 w-auto object-contain" />
         <span
           className={`
             hidden overflow-hidden whitespace-nowrap text-white font-display md:inline-block
@@ -50,7 +50,7 @@ function Navbar({
             }
           `}
         >
-          daffa.
+          affa.
         </span>
       </div>
 
