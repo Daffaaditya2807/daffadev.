@@ -41,7 +41,6 @@ create table if not exists public.tech_stacks (
   name text not null,
   icon_key text not null,
   color text,
-  sort_order integer not null default 0,
   is_active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -70,7 +69,7 @@ create index if not exists typing_texts_public_order_idx
   on public.typing_texts (is_active, sort_order, created_at);
 
 create index if not exists tech_stacks_public_order_idx
-  on public.tech_stacks (is_active, sort_order, created_at);
+  on public.tech_stacks (is_active, created_at);
 
 create index if not exists journeys_public_order_idx
   on public.journeys (is_active, sort_order, date_start desc);
@@ -232,19 +231,18 @@ set
   sort_order = excluded.sort_order,
   is_active = true;
 
-insert into public.tech_stacks (name, icon_key, color, sort_order)
+insert into public.tech_stacks (name, icon_key, color)
 values
-  ('Flutter', 'flutter', '#02569B', 1),
-  ('Dart', 'dart', '#0175C2', 2),
-  ('Laravel', 'laravel', '#FF2D20', 3),
-  ('PHP', 'php', '#777BB4', 4),
-  ('MySQL', 'mysql', '#4479A1', 5),
-  ('Firebase', 'firebase', '#FFCA28', 6),
-  ('Vue', 'vue', '#4FC08D', 7),
-  ('Postman', 'postman', '#FF6C37', 8)
+  ('Flutter', 'flutter', '#02569B'),
+  ('Dart', 'dart', '#0175C2'),
+  ('Laravel', 'laravel', '#FF2D20'),
+  ('PHP', 'php', '#777BB4'),
+  ('MySQL', 'mysql', '#4479A1'),
+  ('Firebase', 'firebase', '#FFCA28'),
+  ('Vue', 'vue', '#4FC08D'),
+  ('Postman', 'postman', '#FF6C37')
 on conflict (icon_key) do update
 set
   name = excluded.name,
   color = excluded.color,
-  sort_order = excluded.sort_order,
   is_active = true;

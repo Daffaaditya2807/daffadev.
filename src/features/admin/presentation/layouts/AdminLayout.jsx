@@ -1,51 +1,43 @@
+import { useState, useCallback } from 'react'
 import { Outlet } from 'react-router-dom'
-import Swal from 'sweetalert2'
-import 'sweetalert2/dist/sweetalert2.min.css'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import * as Dialog from '@radix-ui/react-dialog'
+import { Button } from '@/components/ui/button'
 import SEO from '@/components/common/SEO'
 import Sidebar from '../components/partials/Sidebar'
 import Header from '../components/partials/Header'
 
 const AdminLayout = () => {
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', text: '', resolve: null })
+
   const showToast = ({ icon = 'success', title }) => {
-    Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2400,
-      timerProgressBar: true,
-      background: '#111111',
-      color: '#ffffff',
-      customClass: {
-        popup: 'border border-white/10 shadow-2xl shadow-black/50',
-      },
-    }).fire({
-      icon,
-      title,
-    })
+    if (icon === 'success') {
+      toast.success(title, { theme: 'dark' });
+    } else if (icon === 'error') {
+      toast.error(title, { theme: 'dark' });
+    } else {
+      toast(title, { theme: 'dark' });
+    }
   }
 
-  const confirmDelete = async ({
+  const confirmDelete = useCallback(({
     title = 'Hapus data?',
     text = 'Data yang dihapus tidak bisa dikembalikan.',
   } = {}) => {
-    const result = await Swal.fire({
-      title,
-      text,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ya, hapus',
-      cancelButtonText: 'Batal',
-      reverseButtons: true,
-      background: '#111111',
-      color: '#ffffff',
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#3f3f46',
-      customClass: {
-        popup: 'border border-white/10 shadow-2xl shadow-black/50',
-      },
+    return new Promise((resolve) => {
+      setConfirmDialog({ isOpen: true, title, text, resolve })
     })
+  }, [])
 
-    return result.isConfirmed
+  const handleConfirm = () => {
+    if (confirmDialog.resolve) confirmDialog.resolve(true)
+    setConfirmDialog({ isOpen: false, title: '', text: '', resolve: null })
+  }
+
+  const handleCancel = () => {
+    if (confirmDialog.resolve) confirmDialog.resolve(false)
+    setConfirmDialog({ isOpen: false, title: '', text: '', resolve: null })
   }
 
   return (
@@ -67,6 +59,32 @@ const AdminLayout = () => {
           </div>
         </main>
       </div>
+      
+      <ToastContainer position="top-right" autoClose={2400} />
+
+      <Dialog.Root open={confirmDialog.isOpen} onOpenChange={(open) => !open && handleCancel()}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/10 bg-black/90 p-6 text-white shadow-2xl shadow-black/60 outline-none">
+            <div className="flex flex-col gap-4">
+              <div>
+                <Dialog.Title className="text-lg font-semibold text-white">{confirmDialog.title}</Dialog.Title>
+                <Dialog.Description className="mt-2 text-sm text-white/60">
+                  {confirmDialog.text}
+                </Dialog.Description>
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button type="button" variant="outline" onClick={handleCancel} className="border-white/10 bg-white/6 text-white hover:bg-white/10 hover:text-white">
+                  Batal
+                </Button>
+                <Button type="button" variant="destructive" onClick={handleConfirm}>
+                  Ya, Hapus
+                </Button>
+              </div>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   )
 }

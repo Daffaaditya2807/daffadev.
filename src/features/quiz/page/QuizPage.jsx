@@ -140,7 +140,7 @@ function QuizPage() {
     : 0
 
   return (
-    <main className="min-h-screen bg-[#030303] px-4 py-10 text-white sm:px-6">
+    <main className="min-h-screen bg-[#0a0a0a] px-4 py-10 text-white sm:px-6">
       <SEO
         title="Hard Quiz"
         description="Quiz hard multiple choice dengan kategori acak dari Open Trivia DB."

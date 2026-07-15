@@ -147,7 +147,6 @@ const TechStackPage = () => {
                     <TableHead className="px-5 py-3 text-white/45">Stack</TableHead>
                     <TableHead className="px-5 py-3 text-white/45">Icon Key</TableHead>
                     <TableHead className="px-5 py-3 text-white/45">Color</TableHead>
-                    <TableHead className="px-5 py-3 text-white/45">Order</TableHead>
                     <TableHead className="px-5 py-3 text-white/45">Status</TableHead>
                     <TableHead className="px-5 py-3 text-right text-white/45">Aksi</TableHead>
                   </TableRow>
@@ -176,7 +175,6 @@ const TechStackPage = () => {
                             {item.color}
                           </div>
                         </TableCell>
-                        <TableCell className="px-5 py-4 text-white/60">{item.sort_order}</TableCell>
                         <TableCell className="px-5 py-4">
                           <button
                             type="button"
@@ -316,7 +314,7 @@ const TechStackPage = () => {
                     name="icon_key"
                     value={form.icon_key}
                     onChange={handleChange}
-                    className="h-10 w-full rounded-lg border border-white/10 bg-black/40 px-3 text-sm text-white outline-none transition focus-visible:border-white/35 focus-visible:ring-3 focus-visible:ring-white/10"
+                    className="h-10 w-full rounded-lg border border-white/10 bg-black/40 px-3 text-sm text-white outline-none transition focus-visible:border-white/35 focus-visible:ring-3 focus-visible:ring-white/10 scrollbar-none [::-webkit-scrollbar]:hidden"
                   >
                     {iconOptions.map((option) => (
                       <option key={option.value} value={option.value} className="bg-black text-white">
@@ -347,20 +345,6 @@ const TechStackPage = () => {
                       className="h-10 border-white/10 bg-white/6 text-white placeholder:text-white/30 focus-visible:border-white/35 focus-visible:ring-white/10"
                     />
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="sort_order" className="text-sm font-medium text-white/80">
-                    Sort Order
-                  </label>
-                  <Input
-                    id="sort_order"
-                    name="sort_order"
-                    type="number"
-                    value={form.sort_order}
-                    onChange={handleChange}
-                    className="h-10 border-white/10 bg-white/6 text-white placeholder:text-white/30 focus-visible:border-white/35 focus-visible:ring-white/10"
-                  />
                 </div>
               </div>
 

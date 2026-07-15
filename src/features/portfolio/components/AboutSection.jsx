@@ -1,5 +1,4 @@
-import { memo } from "react";
-import { useAboutSection } from "../hooks/useAboutSection";
+import { memo, useEffect, useRef, useState } from "react";
 import memojiImage from "../../../assets/images/userpng.png";
 import { supabase } from "@/core/supabase";
 
@@ -7,20 +6,82 @@ const STORAGE_BUCKET = "portfolio-assets";
 
 const getPublicImageUrl = (path) => {
   if (!path) return "";
-
-  if (path.startsWith("http")) {
-    return path;
-  }
-
+  if (path.startsWith("http")) return path;
   return supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
 };
 
 function AboutSection() {
-  const { experienceRef, profile, experiences } = useAboutSection();
+  const experienceRef = useRef(null);
+  const [profile, setProfile] = useState(null);
+  const [experiences, setExperiences] = useState([]);
+  const scrollProgressRef = useRef(0);
 
-  const dynamicAboutImage = profile?.about_image
-    ? getPublicImageUrl(profile.about_image)
-    : memojiImage;
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      if (!experienceRef.current) return;
+      experienceRef.current.querySelectorAll("[data-experience-active-at]").forEach((item) => {
+        item.dataset.active = scrollProgressRef.current > Number(item.dataset.experienceActiveAt);
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [experiences]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchProfile = async () => {
+      const { data } = await supabase.from("profile").select("*").eq("id", 1).maybeSingle();
+      if (isMounted && data) setProfile(data);
+    };
+    fetchProfile();
+    return () => { isMounted = false; };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchExperiences = async () => {
+      const { data } = await supabase.from("journeys").select("*").eq("is_active", true).order("date_start", { ascending: false });
+      if (isMounted && data) {
+        setExperiences(data.map((item, index) => ({ ...item, activeAt: item.activeAt ?? index / Math.max(data.length - 1, 1) })));
+      }
+    };
+    fetchExperiences();
+    return () => { isMounted = false; };
+  }, []);
+
+  useEffect(() => {
+    const calculateScrollProgress = () => {
+      if (!experienceRef.current) return;
+      const rect = experienceRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const start = viewportHeight * 0.8;
+      const end = viewportHeight * 0.25;
+      const nextProgress = Math.min(Math.max((start - rect.top) / (start - end + rect.height), 0), 1);
+      
+      if (Math.abs(nextProgress - scrollProgressRef.current) > 0.015 || nextProgress === 0 || nextProgress === 1) {
+        scrollProgressRef.current = nextProgress;
+        experienceRef.current.style.setProperty("--scroll-progress", nextProgress);
+      }
+      experienceRef.current.querySelectorAll("[data-experience-active-at]").forEach((item) => {
+        item.dataset.active = nextProgress > Number(item.dataset.experienceActiveAt);
+      });
+    };
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => { calculateScrollProgress(); ticking = false; });
+      }
+    };
+    calculateScrollProgress();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, []);
+
+  const dynamicAboutImage = profile?.about_image ? getPublicImageUrl(profile.about_image) : memojiImage;
 
   return (
     <section className="mx-auto max-w-6xl animate-fade-in">

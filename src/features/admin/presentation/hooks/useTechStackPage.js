@@ -21,7 +21,6 @@ export function useTechStackPage() {
     const { data, error } = await supabase
       .from('tech_stacks')
       .select('*')
-      .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true })
 
     if (error) {
@@ -39,7 +38,6 @@ export function useTechStackPage() {
       const { data, error } = await supabase
         .from('tech_stacks')
         .select('*')
-        .order('sort_order', { ascending: true })
         .order('created_at', { ascending: true })
 
       if (error) {
@@ -62,7 +60,7 @@ export function useTechStackPage() {
       const nextValue = type === 'checkbox' ? checked : value
       const nextForm = {
         ...current,
-        [name]: name === 'sort_order' ? Number(nextValue) : nextValue,
+        [name]: nextValue,
       }
 
       if (name === 'icon_key' && !editingId) {
@@ -89,7 +87,6 @@ export function useTechStackPage() {
       name: form.name,
       icon_key: form.icon_key,
       color: form.color,
-      sort_order: Number(form.sort_order) || 0,
       is_active: form.is_active,
     }
 
@@ -117,7 +114,6 @@ export function useTechStackPage() {
       name: item.name || '',
       icon_key: item.icon_key || 'flutter',
       color: item.color || colorMap[item.icon_key] || '#ffffff',
-      sort_order: item.sort_order || 0,
       is_active: Boolean(item.is_active),
     })
     setMessage('')

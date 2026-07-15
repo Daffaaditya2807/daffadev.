@@ -18,7 +18,7 @@ function MainLayout({
       <div
         className="fixed inset-0 z-0"
         style={{
-          backgroundColor: "#030303",
+          backgroundColor: "#0a0a0a",
           backgroundSize: "400% 400%",
           // animation: "gradientShift 15s ease infinite",
         }}

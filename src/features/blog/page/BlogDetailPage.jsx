@@ -80,7 +80,7 @@ function BlogDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#030303] text-white/50">
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] text-white/50">
         <SEO title="Memuat Artikel" path={`/blog/${slug}`} noIndex />
         Memuat artikel...
       </div>
@@ -89,7 +89,7 @@ function BlogDetailPage() {
 
   if (!blog) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#030303] text-white">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#0a0a0a] text-white">
         <SEO title="Artikel Tidak Ditemukan" path={`/blog/${slug}`} noIndex />
         <p className="text-white/50">Artikel tidak ditemukan.</p>
         <Link to="/blog" className="mt-4 text-sm text-white/70 underline hover:text-white">
@@ -103,7 +103,7 @@ function BlogDetailPage() {
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${blog.title}\n${articleUrl}`)}`
 
   return (
-    <div className="relative min-h-screen w-full bg-[#030303] text-white">
+    <div className="relative min-h-screen w-full bg-[#0a0a0a] text-white">
       <SEO
         title={blog.title}
         description={getPlainText(blog.description).slice(0, 155)}
